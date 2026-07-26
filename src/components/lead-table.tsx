@@ -56,8 +56,8 @@ export async function LeadTable() {
               </tr>
             </thead>
             <tbody>
-              {leads.map((lead) => (
-                <LeadRow key={lead.id} lead={lead} />
+              {leads.map((lead, index) => (
+                <LeadRow key={lead.id} lead={lead} index={index} />
               ))}
             </tbody>
           </table>
