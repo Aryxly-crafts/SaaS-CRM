@@ -31,7 +31,6 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (request.nextUrl.pathname.startsWith("/uipreview")) return supabaseResponse;
 
   if (!user && request.nextUrl.pathname !== "/login") {
     const url = request.nextUrl.clone();
