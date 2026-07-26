@@ -83,7 +83,7 @@ export function LeadRow({ lead, index = 0 }: { lead: Lead; index?: number }) {
             <ChevronDown size={15} strokeWidth={1.75} />
           </motion.span>
         </td>
-      </tr>
+      </motion.tr>
 
       <AnimatePresence initial={false}>
         {expanded && (
