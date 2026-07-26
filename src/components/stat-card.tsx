@@ -27,29 +27,26 @@ function AnimatedValue({ value }: { value: string | number }) {
   const inView = useInView(ref, { once: true, amount: 0.5 });
   const [display, setDisplay] = useState(parsed ? 0 : null);
 
+  const target = parsed?.value;
+
   useEffect(() => {
-    if (!parsed || !inView) return;
+    if (target === undefined || !inView) return;
 
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduce) {
-      setDisplay(parsed.value);
-      return;
-    }
-
-    const duration = 650;
+    const duration = reduce ? 0 : 650;
     const start = performance.now();
     let raf = 0;
 
     const tick = (now: number) => {
-      const t = Math.min((now - start) / duration, 1);
+      const t = duration === 0 ? 1 : Math.min((now - start) / duration, 1);
       // Ease-out cubic so it decelerates into the final number.
-      setDisplay(parsed.value * (1 - Math.pow(1 - t, 3)));
+      setDisplay(target * (1 - Math.pow(1 - t, 3)));
       if (t < 1) raf = requestAnimationFrame(tick);
     };
 
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [inView, parsed?.value]);
+  }, [inView, target]);
 
   if (!parsed || display === null) {
     return <span ref={ref}>{value}</span>;
