@@ -1,17 +1,65 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f8fafc;
-  --foreground: #0f172a;
+  /* Warm neutral canvas the app window floats on. */
+  --canvas: #f1efec;
+  --surface: #ffffff;
+  --surface-muted: #faf9f8;
+
+  /* Warm greys for text and hairline borders. */
+  --ink: #1a1a1a;
+  --ink-muted: #6b6560;
+  --ink-subtle: #9a938c;
+  --line: #eae7e3;
+  --line-strong: #ddd9d4;
+
+  /* Coral accent from the reference. */
+  --accent: #f0512b;
+  --accent-hover: #d94420;
+  --accent-soft: #fdeee9;
+
+  /* Elevation scale — soft, wide, low-opacity (never harsh). */
+  --elevation-window: 0 24px 60px -12px rgba(28, 22, 18, 0.14),
+    0 8px 20px -8px rgba(28, 22, 18, 0.06);
+  --elevation-card: 0 1px 2px rgba(28, 22, 18, 0.04);
+  --elevation-card-hover: 0 4px 14px -4px rgba(28, 22, 18, 0.1);
+  --elevation-popover: 0 12px 32px -8px rgba(28, 22, 18, 0.16);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-ink-subtle: var(--ink-subtle);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-soft: var(--accent-soft);
   --font-sans: var(--font-sans);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--canvas);
+  color: var(--ink);
+  font-feature-settings: "cv11", "ss01";
+}
+
+/* Tabular figures everywhere numbers are compared column-to-column. */
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Honour reduced-motion globally rather than per-component. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

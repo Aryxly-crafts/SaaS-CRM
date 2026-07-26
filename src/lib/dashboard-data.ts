@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import type { Lead, LeadStatus } from "@/lib/leads";
+import { STATUS_ORDER, type Lead, type LeadStatus } from "@/lib/leads";
 
 export interface DashboardStats {
   activeLeads: number;
@@ -64,29 +64,117 @@ export interface TrendPoint {
   leadsWon: number;
 }
 
-// Fetches revenue/leads-won trend data for the last 30 days. Revenue is
-// always 0 until the payments table exists in a later slice.
-export async function getTrendData(): Promise<TrendPoint[]> {
+const TREND_WINDOW_DAYS = 30;
+
+// Builds a continuous day-by-day series for the last 30 days so the chart
+// always has a real axis, filling gaps with zeroes.
+export async function getTrendData(): Promise<{
+  points: TrendPoint[];
+  hasData: boolean;
+}> {
   const supabase = await createClient();
 
-  const thirtyDaysAgo = new Date();
-  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+  const start = new Date();
+  start.setHours(0, 0, 0, 0);
+  start.setDate(start.getDate() - (TREND_WINDOW_DAYS - 1));
 
   const { data, error } = await supabase
     .from("leads")
-    .select("created_at, status")
+    .select("created_at")
     .eq("status", "won")
-    .gte("created_at", thirtyDaysAgo.toISOString());
+    .gte("created_at", start.toISOString());
 
   if (error) throw error;
 
-  const byDate = new Map<string, number>();
+  const wonByDate = new Map<string, number>();
   for (const row of data ?? []) {
     const day = row.created_at.slice(0, 10);
-    byDate.set(day, (byDate.get(day) ?? 0) + 1);
+    wonByDate.set(day, (wonByDate.get(day) ?? 0) + 1);
   }
 
-  return Array.from(byDate.entries())
-    .map(([date, leadsWon]) => ({ date, revenue: 0, leadsWon }))
-    .sort((a, b) => a.date.localeCompare(b.date));
+  const points: TrendPoint[] = [];
+  for (let i = 0; i < TREND_WINDOW_DAYS; i++) {
+    const day = new Date(start);
+    day.setDate(start.getDate() + i);
+    const key = day.toISOString().slice(0, 10);
+    points.push({
+      date: key,
+      revenue: 0,
+      leadsWon: wonByDate.get(key) ?? 0,
+    });
+  }
+
+  return { points, hasData: wonByDate.size > 0 };
+}
+
+export interface PipelineStage {
+  status: LeadStatus;
+  count: number;
+}
+
+// Counts leads per status so the pipeline panel can show a breakdown bar.
+export async function getPipelineBreakdown(): Promise<PipelineStage[]> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase.from("leads").select("status");
+  if (error) throw error;
+
+  const counts = new Map<LeadStatus, number>();
+  for (const row of data ?? []) {
+    const status = row.status as LeadStatus;
+    counts.set(status, (counts.get(status) ?? 0) + 1);
+  }
+
+  return STATUS_ORDER.map((status) => ({
+    status,
+    count: counts.get(status) ?? 0,
+  }));
+}
+
+export interface DeadlineItem {
+  id: string;
+  title: string;
+  due: string;
+}
+
+// Upcoming project deadlines. Returns empty until the projects table exists.
+export async function getUpcomingDeadlines(): Promise<DeadlineItem[]> {
+  return [];
+}
+
+export interface ActivityItem {
+  id: string;
+  label: string;
+  when: string;
+}
+
+const relative = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
+
+// Turns a timestamp into a short relative label like "2 days ago".
+function timeAgo(iso: string): string {
+  const diffMs = Date.now() - new Date(iso).getTime();
+  const minutes = Math.round(diffMs / 60000);
+  if (Math.abs(minutes) < 60) return relative.format(-minutes, "minute");
+  const hours = Math.round(minutes / 60);
+  if (Math.abs(hours) < 24) return relative.format(-hours, "hour");
+  return relative.format(-Math.round(hours / 24), "day");
+}
+
+// Most recently created leads, shown as the activity feed.
+export async function getRecentActivity(): Promise<ActivityItem[]> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("leads")
+    .select("id, business_name, status, created_at")
+    .order("created_at", { ascending: false })
+    .limit(5);
+
+  if (error) throw error;
+
+  return (data ?? []).map((row) => ({
+    id: row.id as string,
+    label: `${row.business_name} added as ${row.status}`,
+    when: timeAgo(row.created_at as string),
+  }));
 }

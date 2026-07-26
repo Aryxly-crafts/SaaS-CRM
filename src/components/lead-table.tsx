@@ -1,40 +1,58 @@
-import { Users } from "lucide-react";
+import { Users, Plus } from "lucide-react";
+import Link from "next/link";
 import { getLeads } from "@/lib/dashboard-data";
 import { LeadRow } from "./lead-row";
+import { TableTabs } from "./table-tabs";
 
-// Fetches and renders all leads in the core dashboard table, or an empty state.
+const COLUMNS = [
+  "Date",
+  "Business Name",
+  "Phone",
+  "Category",
+  "Status",
+  "Priority",
+];
+
+// The core dashboard table, styled after the reference's Lead Quality panel.
 export async function LeadTable() {
   const leads = await getLeads();
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white">
-      <div className="border-b border-slate-200 px-6 py-4">
-        <h2 className="text-sm font-semibold text-slate-900">Lead Quality</h2>
-      </div>
+    <section className="border-line overflow-hidden rounded-[16px] border">
+      <TableTabs count={leads.length} />
 
       {leads.length === 0 ? (
-        <div className="flex flex-col items-center justify-center gap-3 px-6 py-16 text-center">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-100">
-            <Users size={22} className="text-slate-400" strokeWidth={1.75} />
-          </div>
-          <p className="text-sm font-medium text-slate-900">No leads yet</p>
-          <p className="max-w-xs text-sm text-slate-500">
-            Leads you add will show up here with status, priority score, and
-            full details.
+        <div className="flex flex-col items-center justify-center gap-2.5 px-6 py-14 text-center">
+          <span className="bg-surface-muted border-line flex h-10 w-10 items-center justify-center rounded-full border">
+            <Users size={17} className="text-ink-subtle" strokeWidth={1.75} />
+          </span>
+          <p className="text-ink text-[13px] font-medium">No leads yet</p>
+          <p className="text-ink-muted max-w-[280px] text-[12px] leading-relaxed">
+            Add your first lead and it will appear here with status, priority
+            score, and expandable detail.
           </p>
+          <Link
+            href="/leads"
+            className="bg-accent hover:bg-accent-hover mt-1 flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[12px] font-medium text-white transition-colors"
+          >
+            <Plus size={13} strokeWidth={2.25} />
+            Add your first lead
+          </Link>
         </div>
       ) : (
         <div className="overflow-x-auto">
-          <table className="w-full">
+          <table className="w-full border-collapse">
             <thead>
-              <tr className="border-b border-slate-200 text-left text-xs font-medium text-slate-500">
-                <th className="px-4 py-3">Date</th>
-                <th className="px-4 py-3">Business Name</th>
-                <th className="px-4 py-3">Phone</th>
-                <th className="px-4 py-3">Category</th>
-                <th className="px-4 py-3">Status</th>
-                <th className="px-4 py-3">Priority Score</th>
-                <th className="px-4 py-3" />
+              <tr className="border-line bg-surface-muted border-b text-left">
+                {COLUMNS.map((column) => (
+                  <th
+                    key={column}
+                    className="text-ink-subtle px-3 py-2 text-[10px] font-semibold tracking-[0.06em] uppercase first:pr-3 first:pl-4"
+                  >
+                    {column}
+                  </th>
+                ))}
+                <th className="w-8" />
               </tr>
             </thead>
             <tbody>
@@ -45,6 +63,6 @@ export async function LeadTable() {
           </table>
         </div>
       )}
-    </div>
+    </section>
   );
 }
