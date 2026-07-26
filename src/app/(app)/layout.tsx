@@ -1,8 +1,10 @@
 import { createClient } from "@/lib/supabase/server";
 import { Sidebar } from "./sidebar";
-import { signOut } from "./actions";
+import { PageTitleProvider } from "./page-title-context";
+import { TopBar } from "./top-bar";
 
-// Shared shell for every authenticated screen: sidebar + top bar.
+// Shared shell for every authenticated screen: sidebar, top bar, and a
+// scrolling content column that fills the viewport edge to edge.
 export default async function AppLayout({
   children,
 }: {
@@ -12,24 +14,19 @@ export default async function AppLayout({
   const {
     data: { user },
   } = await supabase.auth.getUser();
+  const userEmail = user?.email ?? "";
 
   return (
-    <div className="flex min-h-screen">
-      <Sidebar />
-      <div className="flex flex-1 flex-col">
-        <header className="flex items-center justify-end gap-4 border-b border-gray-200 bg-white px-8 py-4">
-          <span className="text-sm text-gray-500">{user?.email}</span>
-          <form action={signOut}>
-            <button
-              type="submit"
-              className="rounded-lg border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-50"
-            >
-              Sign out
-            </button>
-          </form>
-        </header>
-        <main className="flex-1 px-8 py-6">{children}</main>
+    <PageTitleProvider>
+      <div className="bg-surface flex h-screen overflow-hidden">
+        <Sidebar userEmail={userEmail} />
+        <div className="flex min-w-0 flex-1 flex-col">
+          <TopBar userEmail={userEmail} />
+          <main className="scroll-hidden flex-1 overflow-y-auto px-6 py-5">
+            {children}
+          </main>
+        </div>
       </div>
-    </div>
+    </PageTitleProvider>
   );
 }

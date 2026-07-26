@@ -1,26 +1,85 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Brand palette — cool neutrals with a single blue accent. */
+  --canvas: #edeff3;
+  --surface: #fcfdfd;
+  --surface-muted: #f4f6f9;
+
+  --ink: #2a2b33;
+  --ink-muted: #555663;
+  --ink-subtle: #9fa0b5;
+
+  --line: #dfe4ea;
+  --line-strong: #c6d1d7;
+
+  /* Blue carries every interactive state. */
+  --accent: #2f7eda;
+  --accent-hover: #2569b9;
+  --accent-soft: #e8f0fb;
+
+  /* Status tints — desaturated so they read as data, not decoration. */
+  --danger: #b04545;
+  --danger-soft: #f7e9e9;
+  --positive: #3d7a5c;
+  --info: #2f7eda;
+
+  /* Elevation — tight and neutral. */
+  --elevation-card: 0 1px 2px rgba(42, 43, 51, 0.05);
+  --elevation-card-hover: 0 4px 14px -4px rgba(42, 43, 51, 0.1);
+  --elevation-popover: 0 12px 32px -8px rgba(42, 43, 51, 0.18);
+  --elevation-window: 0 24px 60px -12px rgba(42, 43, 51, 0.16);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-ink-subtle: var(--ink-subtle);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-soft: var(--accent-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-positive: var(--positive);
+  --color-info: var(--info);
+  --font-sans: var(--font-sans);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--canvas);
+  color: var(--ink);
+}
+
+/* Tabular figures wherever numbers line up column-to-column. */
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Scroll without a visible scrollbar. */
+.scroll-hidden {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.scroll-hidden::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
+
+/* Honour reduced-motion globally rather than per-component. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

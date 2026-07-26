@@ -1,11 +1,22 @@
-// Dashboard placeholder — stat cards and tables land here in later slices.
+import { SetPageTitle } from "./page-title-context";
+import { StatCardRow } from "@/components/stat-card-row";
+import { TrendsPanel } from "@/components/trends-panel";
+import { LeadTable } from "@/components/lead-table";
+import { RightPanel } from "@/components/right-panel";
+
+// Dashboard: metrics strip, trends, lead table, and the right-hand panels.
 export default function DashboardPage() {
   return (
-    <div>
-      <h1 className="mb-1 text-xl font-semibold text-gray-900">Dashboard</h1>
-      <p className="text-sm text-gray-500">
-        Stat cards, lead table, and activity panels will go here.
-      </p>
-    </div>
+    <>
+      <SetPageTitle title="Overview" />
+      <div className="flex flex-col gap-4 xl:flex-row">
+        <div className="flex min-w-0 flex-1 flex-col gap-4">
+          <StatCardRow />
+          <TrendsPanel />
+          <LeadTable />
+        </div>
+        <RightPanel />
+      </div>
+    </>
   );
 }
