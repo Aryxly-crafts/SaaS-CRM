@@ -89,7 +89,7 @@ export function Sidebar({ userEmail }: { userEmail: string }) {
           className="h-[30px] w-[30px] object-contain"
         />
         <span className="text-ink text-[15px] font-semibold tracking-tight">
-          Arylxy
+          Aryxly
         </span>
       </div>
 

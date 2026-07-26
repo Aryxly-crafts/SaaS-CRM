@@ -26,7 +26,7 @@ export default async function LoginPage({
           className="h-[26px] w-[26px] object-contain drop-shadow-sm"
         />
         <span className="text-[15px] font-semibold tracking-tight text-white drop-shadow-sm">
-          Arylxy
+          Aryxly
         </span>
       </div>
 
@@ -97,7 +97,7 @@ export default async function LoginPage({
           </button>
 
           <p className="text-ink-muted mt-4 text-center text-[11px]">
-            Internal tool — Arylxy founders only.
+            Internal tool — Aryxly founders only.
           </p>
         </form>
       </div>

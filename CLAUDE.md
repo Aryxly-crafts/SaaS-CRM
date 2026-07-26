@@ -1,7 +1,7 @@
-# Arylxy Internal — Lead & Project Tracker
+# Aryxly Internal — Lead & Project Tracker
 
 ## What this is
-An internal-only tool for Arylxy (2 users: Akshith, Yashashwini) to track
+An internal-only tool for Aryxly (2 users: Akshith, Yashashwini) to track
 leads, clients, projects, payments, and generated documents. This is NOT
 a public product — no public signup, no marketing site, no SEO concerns.
 It replaces manual lead/project tracking currently done in chat and notes.

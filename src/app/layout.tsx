@@ -9,8 +9,8 @@ const chivo = Chivo({
 });
 
 export const metadata: Metadata = {
-  title: "Arylxy — Lead & Project Tracker",
-  description: "Internal lead, project, and payment tracker for Arylxy.",
+  title: "Aryxly — Lead & Project Tracker",
+  description: "Internal lead, project, and payment tracker for Aryxly.",
 };
 
 export default function RootLayout({
