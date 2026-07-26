@@ -1,8 +1,9 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-// Refreshes the auth session on every request and redirects signed-out
-// users to /login (no route is public except /login itself).
+// Verifies the session on every request and redirects signed-out users to
+// /login. Uses getClaims(), which validates the JWT locally instead of
+// calling the auth server, so it costs no network round-trip.
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
 
@@ -27,18 +28,16 @@ export async function updateSession(request: NextRequest) {
     }
   );
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data } = await supabase.auth.getClaims();
+  const signedIn = Boolean(data?.claims);
 
-
-  if (!user && request.nextUrl.pathname !== "/login") {
+  if (!signedIn && request.nextUrl.pathname !== "/login") {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);
   }
 
-  if (user && request.nextUrl.pathname === "/login") {
+  if (signedIn && request.nextUrl.pathname === "/login") {
     const url = request.nextUrl.clone();
     url.pathname = "/";
     return NextResponse.redirect(url);

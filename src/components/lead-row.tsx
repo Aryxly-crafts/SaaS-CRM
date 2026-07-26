@@ -26,13 +26,20 @@ function DetailRow({ label, children }: { label: string; children: React.ReactNo
 
 // A lead row that expands into full detail, mirroring the reference's
 // expanded "Designhub" row.
-export function LeadRow({ lead }: { lead: Lead }) {
+export function LeadRow({ lead, index = 0 }: { lead: Lead; index?: number }) {
   const [expanded, setExpanded] = useState(false);
   const toggle = () => setExpanded((v) => !v);
 
   return (
     <>
-      <tr
+      <motion.tr
+        initial={{ opacity: 0, y: 4 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{
+          duration: 0.24,
+          delay: Math.min(index, 12) * 0.03,
+          ease: [0.22, 0.61, 0.36, 1],
+        }}
         onClick={toggle}
         onKeyDown={(e) => {
           if (e.key === "Enter" || e.key === " ") {

@@ -2,6 +2,7 @@ import Image from "next/image";
 import { AlertCircle, LogIn } from "lucide-react";
 import { login } from "./actions";
 import { SkyField } from "./sky-field";
+import { SubmitButton } from "./submit-button";
 
 // Sign-in gate — no signup link, only the two founder accounts exist.
 export default async function LoginPage({
@@ -89,12 +90,7 @@ export default async function LoginPage({
             </p>
           )}
 
-          <button
-            type="submit"
-            className="bg-ink mt-4 w-full cursor-pointer rounded-[11px] py-2.5 text-[13px] font-medium text-white transition-opacity hover:opacity-88 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:outline-none"
-          >
-            Sign in
-          </button>
+          <SubmitButton />
 
           <p className="text-ink-muted mt-4 text-center text-[11px]">
             Internal tool — Aryxly founders only.
