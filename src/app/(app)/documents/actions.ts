@@ -38,22 +38,25 @@ export async function uploadDocument(form: FormData) {
     file_url: key,
     file_name: file.name,
   });
-  if (insertError) throw insertError;
+
+  // Don't leave an orphaned file in storage if the row didn't save.
+  if (insertError) {
+    await supabase.storage.from(BUCKET).remove([key]);
+    throw insertError;
+  }
 
   revalidatePath("/documents");
 }
 
-// Removes a document from storage and the table.
+// Removes a document. The row goes first so a storage failure can't leave
+// a record pointing at a file that no longer exists.
 export async function deleteDocument(id: string, fileUrl: string) {
   const supabase = await createClient();
 
-  const { error: storageError } = await supabase.storage
-    .from(BUCKET)
-    .remove([fileUrl]);
-  if (storageError) throw storageError;
-
   const { error } = await supabase.from("documents").delete().eq("id", id);
   if (error) throw error;
+
+  await supabase.storage.from(BUCKET).remove([fileUrl]);
 
   revalidatePath("/documents");
 }

@@ -35,7 +35,9 @@ export function Modal({
     };
   }, [open, onClose]);
 
-  if (typeof document === "undefined") return null;
+  // Only mounts once a client interaction opens it, so there is no DOM to
+  // portal into on the server and no hydration mismatch.
+  if (!open) return null;
 
   return createPortal(
     <AnimatePresence>

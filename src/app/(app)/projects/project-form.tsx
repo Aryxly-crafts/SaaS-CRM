@@ -13,17 +13,29 @@ const STATUS_OPTIONS = [
   { value: "on_hold", label: "On hold" },
 ];
 
-// Create/edit dialog for a project.
+// Create/edit dialog for a project. Renders its own trigger unless the
+// parent drives it via `open`/`onOpenChange`.
 export function ProjectForm({
   clients,
   project,
-  trigger,
+  open: controlledOpen,
+  onOpenChange,
 }: {
   clients: Client[];
   project?: Project;
-  trigger?: React.ReactNode;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }) {
-  const [open, setOpen] = useState(false);
+  const [uncontrolledOpen, setUncontrolledOpen] = useState(false);
+  const isControlled = controlledOpen !== undefined;
+  const open = isControlled ? controlledOpen : uncontrolledOpen;
+
+  // Routes open/close to the parent when controlled, local state otherwise.
+  const setOpen = (next: boolean) => {
+    if (isControlled) onOpenChange?.(next);
+    else setUncontrolledOpen(next);
+  };
+
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
   const editing = Boolean(project);
@@ -49,14 +61,17 @@ export function ProjectForm({
 
   return (
     <>
-      <span onClick={() => setOpen(true)}>
-        {trigger ?? (
-          <Button variant="primary" type="button" disabled={clients.length === 0}>
-            <Plus size={14} strokeWidth={2.25} />
-            New Project
-          </Button>
-        )}
-      </span>
+      {!isControlled && (
+        <Button
+          variant="primary"
+          type="button"
+          onClick={() => setOpen(true)}
+          disabled={clients.length === 0}
+        >
+          <Plus size={14} strokeWidth={2.25} />
+          New Project
+        </Button>
+      )}
 
       <Modal
         open={open}

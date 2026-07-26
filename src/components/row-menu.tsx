@@ -7,11 +7,13 @@ import { MoreHorizontal, Trash2, Loader2 } from "lucide-react";
 export interface RowMenuItem {
   label: string;
   icon: React.ReactNode;
-  onSelect?: () => void;
-  render?: (close: () => void) => React.ReactNode;
+  onSelect: () => void;
+  danger?: boolean;
 }
 
-// Row overflow menu with optional custom items and a confirming delete.
+// Row overflow menu with a confirming delete. Items only fire callbacks —
+// any dialog they open must be owned by the parent row, not this menu,
+// so it survives the menu unmounting.
 export function RowMenu({
   label,
   items = [],
@@ -39,6 +41,8 @@ export function RowMenu({
       <button
         type="button"
         aria-label={label}
+        aria-haspopup="menu"
+        aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
         className="text-ink-subtle hover:text-ink hover:bg-surface-muted flex h-7 w-7 cursor-pointer items-center justify-center rounded-md transition-colors"
       >
@@ -54,30 +58,32 @@ export function RowMenu({
           <>
             <div className="fixed inset-0 z-10" onClick={close} />
             <motion.div
+              role="menu"
               initial={{ opacity: 0, y: -4, scale: 0.97 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -4, scale: 0.97 }}
               transition={{ duration: 0.14, ease: "easeOut" }}
               className="bg-surface border-line absolute top-8 right-0 z-20 w-[176px] overflow-hidden rounded-[10px] border py-1 shadow-[var(--elevation-popover)]"
             >
-              {items.map((item) =>
-                item.render ? (
-                  <div key={item.label}>{item.render(close)}</div>
-                ) : (
-                  <button
-                    key={item.label}
-                    type="button"
-                    onClick={() => {
-                      item.onSelect?.();
-                      close();
-                    }}
-                    className="text-ink-muted hover:text-ink hover:bg-surface-muted flex w-full cursor-pointer items-center gap-2 px-3 py-1.5 text-left text-[12.5px] transition-colors"
-                  >
-                    {item.icon}
-                    {item.label}
-                  </button>
-                )
-              )}
+              {items.map((item) => (
+                <button
+                  key={item.label}
+                  type="button"
+                  role="menuitem"
+                  onClick={() => {
+                    close();
+                    item.onSelect();
+                  }}
+                  className={`flex w-full cursor-pointer items-center gap-2 px-3 py-1.5 text-left text-[12.5px] transition-colors ${
+                    item.danger
+                      ? "text-[#b02a2a] hover:bg-[#fbeaea]"
+                      : "text-ink-muted hover:text-ink hover:bg-surface-muted"
+                  }`}
+                >
+                  {item.icon}
+                  {item.label}
+                </button>
+              ))}
 
               {onDelete && (
                 <>
@@ -112,6 +118,7 @@ export function RowMenu({
                   ) : (
                     <button
                       type="button"
+                      role="menuitem"
                       onClick={() => setConfirming(true)}
                       className="flex w-full cursor-pointer items-center gap-2 px-3 py-1.5 text-left text-[12.5px] text-[#b02a2a] transition-colors hover:bg-[#fbeaea]"
                     >

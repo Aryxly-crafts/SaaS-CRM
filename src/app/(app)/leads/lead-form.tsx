@@ -13,15 +13,27 @@ const STATUS_OPTIONS = STATUS_ORDER.map((status) => ({
     STATUS_STYLES[status].label.slice(1).toLowerCase(),
 }));
 
-// Create/edit dialog for a lead. Renders its own trigger button.
+// Create/edit dialog for a lead. Renders its own "New Lead" trigger unless
+// the parent drives it via `open`/`onOpenChange`.
 export function LeadForm({
   lead,
-  trigger,
+  open: controlledOpen,
+  onOpenChange,
 }: {
   lead?: Lead;
-  trigger?: React.ReactNode;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }) {
-  const [open, setOpen] = useState(false);
+  const [uncontrolledOpen, setUncontrolledOpen] = useState(false);
+  const isControlled = controlledOpen !== undefined;
+  const open = isControlled ? controlledOpen : uncontrolledOpen;
+
+  // Routes open/close to the parent when controlled, local state otherwise.
+  const setOpen = (next: boolean) => {
+    if (isControlled) onOpenChange?.(next);
+    else setUncontrolledOpen(next);
+  };
+
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
   const editing = Boolean(lead);
@@ -42,14 +54,12 @@ export function LeadForm({
 
   return (
     <>
-      <span onClick={() => setOpen(true)}>
-        {trigger ?? (
-          <Button variant="primary" type="button">
-            <Plus size={14} strokeWidth={2.25} />
-            New Lead
-          </Button>
-        )}
-      </span>
+      {!isControlled && (
+        <Button variant="primary" type="button" onClick={() => setOpen(true)}>
+          <Plus size={14} strokeWidth={2.25} />
+          New Lead
+        </Button>
+      )}
 
       <Modal
         open={open}

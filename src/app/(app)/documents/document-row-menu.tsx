@@ -6,12 +6,12 @@ import { RowMenu } from "@/components/row-menu";
 import type { DocumentRecord } from "@/lib/records";
 import { deleteDocument, getDocumentUrl } from "./actions";
 
-// Overflow menu for a document row: open a signed link, or delete.
+// Row actions for a document: open via signed URL, or delete.
 export function DocumentRowMenu({ document }: { document: DocumentRecord }) {
   const [, startTransition] = useTransition();
 
-  // Fetches a signed URL and opens the file in a new tab.
-  const open = () =>
+  // Fetches a short-lived signed URL and opens the file in a new tab.
+  const openFile = () =>
     startTransition(async () => {
       const url = await getDocumentUrl(document.file_url);
       window.open(url, "_blank", "noopener,noreferrer");
@@ -27,7 +27,7 @@ export function DocumentRowMenu({ document }: { document: DocumentRecord }) {
         {
           label: "Open file",
           icon: <ExternalLink size={13} strokeWidth={1.75} />,
-          onSelect: open,
+          onSelect: openFile,
         },
       ]}
     />

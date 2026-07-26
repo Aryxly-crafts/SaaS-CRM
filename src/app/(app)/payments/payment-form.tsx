@@ -14,17 +14,29 @@ const TYPE_OPTIONS = [
   { value: "other", label: "Other" },
 ];
 
-// Create/edit dialog for a payment.
+// Create/edit dialog for a payment. Renders its own trigger unless the
+// parent drives it via `open`/`onOpenChange`.
 export function PaymentForm({
   projects,
   payment,
-  trigger,
+  open: controlledOpen,
+  onOpenChange,
 }: {
   projects: ProjectWithClient[];
   payment?: Payment;
-  trigger?: React.ReactNode;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }) {
-  const [open, setOpen] = useState(false);
+  const [uncontrolledOpen, setUncontrolledOpen] = useState(false);
+  const isControlled = controlledOpen !== undefined;
+  const open = isControlled ? controlledOpen : uncontrolledOpen;
+
+  // Routes open/close to the parent when controlled, local state otherwise.
+  const setOpen = (next: boolean) => {
+    if (isControlled) onOpenChange?.(next);
+    else setUncontrolledOpen(next);
+  };
+
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
   const editing = Boolean(payment);
@@ -50,18 +62,17 @@ export function PaymentForm({
 
   return (
     <>
-      <span onClick={() => setOpen(true)}>
-        {trigger ?? (
-          <Button
-            variant="primary"
-            type="button"
-            disabled={projects.length === 0}
-          >
-            <Plus size={14} strokeWidth={2.25} />
-            Record Payment
-          </Button>
-        )}
-      </span>
+      {!isControlled && (
+        <Button
+          variant="primary"
+          type="button"
+          onClick={() => setOpen(true)}
+          disabled={projects.length === 0}
+        >
+          <Plus size={14} strokeWidth={2.25} />
+          Record Payment
+        </Button>
+      )}
 
       <Modal
         open={open}
