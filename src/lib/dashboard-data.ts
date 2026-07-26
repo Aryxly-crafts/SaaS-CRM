@@ -16,32 +16,55 @@ const ACTIVE_STATUSES: LeadStatus[] = [
   "negotiating",
 ];
 
-// Fetches the 5 dashboard stat-card values from Supabase. Payments/projects
-// tables don't exist yet, so those two stats are 0 until that slice lands.
+// Fetches the 5 dashboard stat-card values from Supabase.
 export async function getDashboardStats(): Promise<DashboardStats> {
   const supabase = await createClient();
-
-  const { count: activeLeads } = await supabase
-    .from("leads")
-    .select("id", { count: "exact", head: true })
-    .in("status", ACTIVE_STATUSES);
 
   const startOfMonth = new Date();
   startOfMonth.setDate(1);
   startOfMonth.setHours(0, 0, 0, 0);
+  const today = new Date().toISOString().slice(0, 10);
 
-  const { count: wonThisMonth } = await supabase
-    .from("leads")
-    .select("id", { count: "exact", head: true })
-    .eq("status", "won")
-    .gte("created_at", startOfMonth.toISOString());
+  const [activeLeads, wonThisMonth, payments, projects] = await Promise.all([
+    supabase
+      .from("leads")
+      .select("id", { count: "exact", head: true })
+      .in("status", ACTIVE_STATUSES),
+    supabase
+      .from("leads")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "won")
+      .gte("created_at", startOfMonth.toISOString()),
+    supabase.from("payments").select("amount"),
+    supabase
+      .from("projects")
+      .select("total_value, advance_amount, final_amount, deadline, status"),
+  ]);
+
+  const revenueCollected = (payments.data ?? []).reduce(
+    (sum, row) => sum + Number(row.amount ?? 0),
+    0
+  );
+
+  // Anything contracted but not yet received counts as pending.
+  const contracted = (projects.data ?? []).reduce((sum, row) => {
+    const total =
+      row.total_value ??
+      Number(row.advance_amount ?? 0) + Number(row.final_amount ?? 0);
+    return sum + Number(total ?? 0);
+  }, 0);
+
+  const overdueProjects = (projects.data ?? []).filter(
+    (row) =>
+      row.status !== "completed" && row.deadline && row.deadline < today
+  ).length;
 
   return {
-    activeLeads: activeLeads ?? 0,
-    wonThisMonth: wonThisMonth ?? 0,
-    revenueCollected: 0,
-    pendingPayments: 0,
-    overdueProjects: 0,
+    activeLeads: activeLeads.count ?? 0,
+    wonThisMonth: wonThisMonth.count ?? 0,
+    revenueCollected,
+    pendingPayments: Math.max(contracted - revenueCollected, 0),
+    overdueProjects,
   };
 }
 
@@ -78,18 +101,32 @@ export async function getTrendData(): Promise<{
   start.setHours(0, 0, 0, 0);
   start.setDate(start.getDate() - (TREND_WINDOW_DAYS - 1));
 
-  const { data, error } = await supabase
-    .from("leads")
-    .select("created_at")
-    .eq("status", "won")
-    .gte("created_at", start.toISOString());
+  const [wonLeads, paymentRows] = await Promise.all([
+    supabase
+      .from("leads")
+      .select("created_at")
+      .eq("status", "won")
+      .gte("created_at", start.toISOString()),
+    supabase
+      .from("payments")
+      .select("amount, paid_date")
+      .not("paid_date", "is", null)
+      .gte("paid_date", start.toISOString().slice(0, 10)),
+  ]);
 
-  if (error) throw error;
+  if (wonLeads.error) throw wonLeads.error;
+  if (paymentRows.error) throw paymentRows.error;
 
   const wonByDate = new Map<string, number>();
-  for (const row of data ?? []) {
+  for (const row of wonLeads.data ?? []) {
     const day = row.created_at.slice(0, 10);
     wonByDate.set(day, (wonByDate.get(day) ?? 0) + 1);
+  }
+
+  const revenueByDate = new Map<string, number>();
+  for (const row of paymentRows.data ?? []) {
+    const day = row.paid_date as string;
+    revenueByDate.set(day, (revenueByDate.get(day) ?? 0) + Number(row.amount));
   }
 
   const points: TrendPoint[] = [];
@@ -99,12 +136,15 @@ export async function getTrendData(): Promise<{
     const key = day.toISOString().slice(0, 10);
     points.push({
       date: key,
-      revenue: 0,
+      revenue: revenueByDate.get(key) ?? 0,
       leadsWon: wonByDate.get(key) ?? 0,
     });
   }
 
-  return { points, hasData: wonByDate.size > 0 };
+  return {
+    points,
+    hasData: wonByDate.size > 0 || revenueByDate.size > 0,
+  };
 }
 
 export interface PipelineStage {
@@ -137,9 +177,39 @@ export interface DeadlineItem {
   due: string;
 }
 
-// Upcoming project deadlines. Returns empty until the projects table exists.
+const deadlineFormat = new Intl.DateTimeFormat("en-US", {
+  month: "short",
+  day: "numeric",
+});
+
+// The next five project deadlines that haven't passed.
 export async function getUpcomingDeadlines(): Promise<DeadlineItem[]> {
-  return [];
+  const supabase = await createClient();
+  const today = new Date().toISOString().slice(0, 10);
+
+  const { data, error } = await supabase
+    .from("projects")
+    .select("id, title, deadline, clients(legal_name)")
+    .neq("status", "completed")
+    .not("deadline", "is", null)
+    .gte("deadline", today)
+    .order("deadline", { ascending: true })
+    .limit(5);
+
+  if (error) throw error;
+
+  return (data ?? []).map((row) => {
+    const relation = row.clients as unknown;
+    const client = (
+      Array.isArray(relation) ? relation[0] : relation
+    ) as { legal_name: string } | null | undefined;
+
+    return {
+      id: row.id as string,
+      title: client ? `${client.legal_name} — ${row.title}` : (row.title as string),
+      due: deadlineFormat.format(new Date(row.deadline as string)),
+    };
+  });
 }
 
 export interface ActivityItem {
