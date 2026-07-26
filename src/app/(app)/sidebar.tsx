@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "motion/react";
@@ -11,7 +12,6 @@ import {
   FileText,
   Settings,
   LogOut,
-  Hexagon,
 } from "lucide-react";
 import { signOut } from "./actions";
 
@@ -48,7 +48,7 @@ function NavLink({
       {active && (
         <motion.div
           layoutId="sidebar-active-pill"
-          className="bg-surface shadow-[var(--elevation-card)] absolute inset-0 rounded-[10px]"
+          className="bg-surface absolute inset-0 rounded-[10px] shadow-[var(--elevation-card)]"
           transition={{ type: "spring", stiffness: 420, damping: 38 }}
         />
       )}
@@ -78,11 +78,16 @@ export function Sidebar({ userEmail }: { userEmail: string }) {
   const initial = userEmail.charAt(0).toUpperCase() || "A";
 
   return (
-    <nav className="bg-surface-muted border-line hidden w-[228px] flex-shrink-0 flex-col overflow-y-auto border-r px-3 py-5 md:flex">
+    <nav className="bg-canvas border-line scroll-hidden hidden w-[228px] flex-shrink-0 flex-col overflow-y-auto border-r px-3 py-5 md:flex">
       <div className="mb-7 flex items-center gap-2 px-2">
-        <span className="bg-accent flex h-7 w-7 items-center justify-center rounded-lg text-white">
-          <Hexagon size={16} strokeWidth={2.25} fill="currentColor" />
-        </span>
+        <Image
+          src="/logo-mark.png"
+          alt=""
+          width={30}
+          height={30}
+          priority
+          className="h-[30px] w-[30px] object-contain"
+        />
         <span className="text-ink text-[15px] font-semibold tracking-tight">
           Arylxy
         </span>

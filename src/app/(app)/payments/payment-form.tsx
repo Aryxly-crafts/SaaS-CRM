@@ -120,7 +120,7 @@ export function PaymentForm({
           />
 
           {error && (
-            <p role="alert" className="text-[12px] text-[#b02a2a]">
+            <p role="alert" className="text-[12px] text-danger">
               {error}
             </p>
           )}

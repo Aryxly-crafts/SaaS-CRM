@@ -49,7 +49,7 @@ export function Modal({
             exit={{ opacity: 0 }}
             transition={{ duration: 0.18 }}
             onClick={onClose}
-            className="fixed inset-0 bg-[#1a1a1a]/35 backdrop-blur-[2px]"
+            className="fixed inset-0 bg-[#2a2b33]/45 backdrop-blur-[2px]"
           />
           <motion.div
             ref={panelRef}

@@ -7,7 +7,7 @@ const BUTTON_VARIANTS: Record<ButtonVariant, string> = {
   secondary:
     "border-line bg-surface text-ink-muted hover:text-ink border hover:bg-surface-muted",
   ghost: "text-ink-muted hover:text-ink hover:bg-surface-muted",
-  danger: "border-line bg-surface border text-[#b02a2a] hover:bg-[#fbeaea]",
+  danger: "border-line bg-surface border text-danger hover:bg-danger-soft",
 };
 
 const BUTTON_BASE =

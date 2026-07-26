@@ -13,8 +13,8 @@ import {
 import type { TrendPoint } from "@/lib/dashboard-data";
 
 const SERIES = [
-  { key: "revenue", label: "Revenue", color: "#f0512b" },
-  { key: "leadsWon", label: "Leads Won", color: "#2b7fd9" },
+  { key: "revenue", label: "Revenue", color: "#2f7eda" },
+  { key: "leadsWon", label: "Leads Won", color: "#9fa0b5" },
 ] as const;
 
 type SeriesKey = (typeof SERIES)[number]["key"];
@@ -77,30 +77,30 @@ export function TrendsChart({
           >
             <CartesianGrid
               strokeDasharray="2 4"
-              stroke="#eae7e3"
+              stroke="#dfe4ea"
               vertical={false}
             />
             <XAxis
               dataKey="date"
               tickFormatter={shortDate}
-              tick={{ fontSize: 11, fill: "#9a938c" }}
+              tick={{ fontSize: 11, fill: "#9fa0b5" }}
               axisLine={false}
               tickLine={false}
               minTickGap={24}
             />
             <YAxis
-              tick={{ fontSize: 11, fill: "#9a938c" }}
+              tick={{ fontSize: 11, fill: "#9fa0b5" }}
               axisLine={false}
               tickLine={false}
               width={44}
             />
             {hasData && (
               <Tooltip
-                cursor={{ stroke: "#ddd9d4", strokeWidth: 1 }}
+                cursor={{ stroke: "#9fa0b5", strokeWidth: 1 }}
                 contentStyle={{
                   borderRadius: 10,
-                  border: "1px solid #eae7e3",
-                  boxShadow: "0 12px 32px -8px rgba(28,22,18,0.16)",
+                  border: "1px solid #dfe4ea",
+                  boxShadow: "0 12px 32px -8px rgba(42,43,51,0.18)",
                   fontSize: 12,
                 }}
                 labelFormatter={(label) => shortDate(String(label))}

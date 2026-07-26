@@ -1,6 +1,16 @@
 import { MoreHorizontal } from "lucide-react";
 import { getPipelineBreakdown, getUpcomingDeadlines, getRecentActivity } from "@/lib/dashboard-data";
-import { STATUS_STYLES } from "@/lib/leads";
+import { STATUS_STYLES, type LeadStatus } from "@/lib/leads";
+
+// Bar colour per pipeline stage so the breakdown reads at a glance.
+const STAGE_BAR_COLORS: Record<LeadStatus, string> = {
+  cold: "#c6d1d7",
+  contacted: "#7fa8e4",
+  interested: "#2f7eda",
+  negotiating: "#2569b9",
+  won: "#3d7a5c",
+  lost: "#c9a0a0",
+};
 
 // Card wrapper shared by every right-column panel.
 function Panel({
@@ -50,8 +60,11 @@ export async function RightPanel() {
               </span>
               <span className="bg-line h-1.5 flex-1 overflow-hidden rounded-full">
                 <span
-                  className="bg-accent block h-full rounded-full transition-[width] duration-500"
-                  style={{ width: `${(stage.count / maxCount) * 100}%` }}
+                  className="block h-full rounded-full transition-[width] duration-500"
+                  style={{
+                    width: `${(stage.count / maxCount) * 100}%`,
+                    background: STAGE_BAR_COLORS[stage.status],
+                  }}
                 />
               </span>
               <span className="text-ink tabular w-4 text-right text-[11.5px] font-medium">

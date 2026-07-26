@@ -9,7 +9,7 @@ const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 // Circular priority gauge, matching the reference's AI-score dial.
 export function PriorityGauge({ score }: { score: number }) {
   const offset = CIRCUMFERENCE - (score / 100) * CIRCUMFERENCE;
-  const color = score >= 75 ? "#f0512b" : score >= 40 ? "#d99a2b" : "#9a938c";
+  const color = score >= 75 ? "#2f7eda" : score >= 40 ? "#555663" : "#9fa0b5";
 
   return (
     <div className="flex flex-shrink-0 flex-col items-center gap-1">
@@ -20,7 +20,7 @@ export function PriorityGauge({ score }: { score: number }) {
             cy="38"
             r={RADIUS}
             fill="none"
-            stroke="#eae7e3"
+            stroke="#dfe4ea"
             strokeWidth="4"
           />
           <motion.circle

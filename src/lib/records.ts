@@ -51,9 +51,9 @@ export const PROJECT_STATUS_STYLES: Record<
   ProjectStatus,
   { label: string; className: string }
 > = {
-  active: { label: "ACTIVE", className: "bg-[#e8f0fb] text-[#2b6cb0]" },
-  completed: { label: "COMPLETED", className: "bg-[#e6f4ec] text-[#1d7a4c]" },
-  on_hold: { label: "ON HOLD", className: "bg-[#fdf1dc] text-[#96690f]" },
+  active: { label: "ACTIVE", className: "bg-[#e8f0fb] text-[#2569b9]" },
+  completed: { label: "COMPLETED", className: "bg-[#e6f0ec] text-[#3d7a5c]" },
+  on_hold: { label: "ON HOLD", className: "bg-[#edeff3] text-[#555663]" },
 };
 
 export const PAYMENT_TYPE_LABELS: Record<PaymentType, string> = {

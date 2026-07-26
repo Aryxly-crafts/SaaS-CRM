@@ -36,7 +36,7 @@ export function StatCard({
           <span
             className={`flex items-center gap-0.5 text-[11px] font-medium ${
               delta.direction === "up"
-                ? "text-emerald-600"
+                ? "text-positive"
                 : delta.direction === "down"
                   ? "text-accent"
                   : "text-ink-subtle"

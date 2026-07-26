@@ -45,7 +45,7 @@ export default async function ProjectsPage() {
             }
           />
         ) : (
-          <div className="overflow-x-auto">
+          <div className="scroll-hidden overflow-x-auto">
             <table className="w-full border-collapse">
               <thead>
                 <tr className="border-line bg-surface-muted border-b text-left">
@@ -86,7 +86,7 @@ export default async function ProjectsPage() {
                         </span>
                         {project.advance_amount !== null && (
                           <span
-                            className={`ml-1.5 text-[10px] font-semibold ${project.advance_paid ? "text-[#1d7a4c]" : "text-ink-subtle"}`}
+                            className={`ml-1.5 text-[10px] font-semibold ${project.advance_paid ? "text-positive" : "text-ink-subtle"}`}
                           >
                             {project.advance_paid ? "PAID" : "DUE"}
                           </span>
@@ -98,7 +98,7 @@ export default async function ProjectsPage() {
                         </span>
                         {project.final_amount !== null && (
                           <span
-                            className={`ml-1.5 text-[10px] font-semibold ${project.final_paid ? "text-[#1d7a4c]" : "text-ink-subtle"}`}
+                            className={`ml-1.5 text-[10px] font-semibold ${project.final_paid ? "text-positive" : "text-ink-subtle"}`}
                           >
                             {project.final_paid ? "PAID" : "DUE"}
                           </span>

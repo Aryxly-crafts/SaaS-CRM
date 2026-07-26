@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Chivo } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({
+const chivo = Chivo({
   variable: "--font-sans",
   subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -18,10 +19,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} h-full antialiased`}>
-      <body className="bg-canvas font-sans text-ink min-h-full">
-        {children}
-      </body>
+    <html lang="en" className={`${chivo.variable} h-full antialiased`}>
+      <body className="bg-canvas text-ink h-full font-sans">{children}</body>
     </html>
   );
 }

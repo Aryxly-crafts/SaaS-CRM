@@ -76,7 +76,7 @@ export function RowMenu({
                   }}
                   className={`flex w-full cursor-pointer items-center gap-2 px-3 py-1.5 text-left text-[12.5px] transition-colors ${
                     item.danger
-                      ? "text-[#b02a2a] hover:bg-[#fbeaea]"
+                      ? "text-danger hover:bg-danger-soft"
                       : "text-ink-muted hover:text-ink hover:bg-surface-muted"
                   }`}
                 >
@@ -102,7 +102,7 @@ export function RowMenu({
                               close();
                             })
                           }
-                          className="cursor-pointer rounded-md bg-[#b02a2a] px-2 py-1 text-[11.5px] font-medium text-white"
+                          className="cursor-pointer rounded-md bg-danger px-2 py-1 text-[11.5px] font-medium text-white"
                         >
                           Delete
                         </button>
@@ -120,7 +120,7 @@ export function RowMenu({
                       type="button"
                       role="menuitem"
                       onClick={() => setConfirming(true)}
-                      className="flex w-full cursor-pointer items-center gap-2 px-3 py-1.5 text-left text-[12.5px] text-[#b02a2a] transition-colors hover:bg-[#fbeaea]"
+                      className="flex w-full cursor-pointer items-center gap-2 px-3 py-1.5 text-left text-[12.5px] text-danger transition-colors hover:bg-danger-soft"
                     >
                       <Trash2 size={13} strokeWidth={1.75} />
                       {deleteLabel}

@@ -59,7 +59,7 @@ export default async function LeadsPage({
             action={<LeadForm />}
           />
         ) : (
-          <div className="overflow-x-auto">
+          <div className="scroll-hidden overflow-x-auto">
             <table className="w-full border-collapse">
               <thead>
                 <tr className="border-line bg-surface-muted border-b text-left">
