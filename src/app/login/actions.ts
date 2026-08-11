@@ -3,13 +3,16 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
-// Signs a user in with email/password; no signup path exists on purpose.
+// Signs a user in with email/password.
 export async function login(formData: FormData) {
   const supabase = await createClient();
 
+  const email = String(formData.get("email") ?? "").trim().toLowerCase();
+  const password = String(formData.get("password") ?? "");
+
   const { error } = await supabase.auth.signInWithPassword({
-    email: String(formData.get("email")),
-    password: String(formData.get("password")),
+    email,
+    password,
   });
 
   if (error) {
