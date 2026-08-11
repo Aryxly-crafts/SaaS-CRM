@@ -8,6 +8,8 @@ export type LeadStatus =
   | "won"
   | "lost";
 
+export type WorkspaceType = "personal" | "team";
+
 export interface Lead {
   id: string;
   business_name: string;
@@ -20,6 +22,8 @@ export interface Lead {
   priority_score: number;
   estimated_value: number | null;
   created_at: string;
+  user_id?: string | null;
+  workspace_type?: WorkspaceType;
 }
 
 // Ordered so "status >= interested" comparisons can use array index.

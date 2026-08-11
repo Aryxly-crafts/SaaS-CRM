@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { getWorkspaceContext } from "@/lib/workspace";
 import { Sidebar } from "./sidebar";
 import { PageTitleProvider } from "./page-title-context";
 import { TopBar } from "./top-bar";
@@ -17,12 +18,14 @@ export default async function AppLayout({
   } = await supabase.auth.getUser();
   const userEmail = user?.email ?? "";
 
+  const ctx = await getWorkspaceContext();
+
   return (
     <PageTitleProvider>
       <div className="bg-surface flex h-screen overflow-hidden">
-        <Sidebar userEmail={userEmail} />
+        <Sidebar userEmail={userEmail} currentMode={ctx.mode} />
         <div className="flex min-w-0 flex-1 flex-col">
-          <TopBar userEmail={userEmail} />
+          <TopBar userEmail={userEmail} currentMode={ctx.mode} />
           <main className="scroll-hidden flex-1 overflow-y-auto px-6 py-5">
             <PageTransition>{children}</PageTransition>
           </main>

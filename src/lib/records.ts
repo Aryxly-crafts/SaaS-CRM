@@ -5,6 +5,8 @@ export type ProjectStatus = "active" | "completed" | "on_hold";
 export type PaymentType = "advance" | "final" | "other";
 export type DocumentType = "agreement" | "sow" | "invoice";
 
+import { WorkspaceType } from "@/lib/leads";
+
 export interface Client {
   id: string;
   lead_id: string | null;
@@ -12,6 +14,8 @@ export interface Client {
   phone: string | null;
   address: string | null;
   created_at: string;
+  user_id?: string | null;
+  workspace_type?: WorkspaceType;
 }
 
 export interface Project {
@@ -27,6 +31,8 @@ export interface Project {
   deadline: string | null;
   status: ProjectStatus;
   created_at: string;
+  user_id?: string | null;
+  workspace_type?: WorkspaceType;
 }
 
 export interface Payment {
@@ -36,6 +42,8 @@ export interface Payment {
   type: PaymentType;
   paid_date: string | null;
   created_at: string;
+  user_id?: string | null;
+  workspace_type?: WorkspaceType;
 }
 
 export interface DocumentRecord {
@@ -45,6 +53,8 @@ export interface DocumentRecord {
   file_url: string;
   file_name: string | null;
   created_at: string;
+  user_id?: string | null;
+  workspace_type?: WorkspaceType;
 }
 
 export const PROJECT_STATUS_STYLES: Record<

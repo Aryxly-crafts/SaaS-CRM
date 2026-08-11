@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import type { PaymentType } from "@/lib/records";
+import { getWorkspaceContext } from "@/lib/workspace";
 
 // Reads an optional text field, treating blank input as null.
 function text(form: FormData, key: string): string | null {
@@ -40,8 +41,13 @@ export async function createPayment(form: FormData) {
     throw new Error("Enter a payment amount greater than zero");
   }
 
+  const ctx = await getWorkspaceContext();
   const supabase = await createClient();
-  const { error } = await supabase.from("payments").insert(fields);
+  const { error } = await supabase.from("payments").insert({
+    ...fields,
+    user_id: ctx.userId,
+    workspace_type: ctx.mode,
+  });
   if (error) throw error;
 
   revalidatePaymentViews();

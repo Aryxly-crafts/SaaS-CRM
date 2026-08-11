@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import type { DocumentType } from "@/lib/records";
+import { getWorkspaceContext } from "@/lib/workspace";
 
 const BUCKET = "documents";
 
@@ -24,6 +25,7 @@ export async function uploadDocument(form: FormData) {
     throw new Error("Choose a file to upload");
   }
 
+  const ctx = await getWorkspaceContext();
   const supabase = await createClient();
   const key = `${projectId}/${Date.now()}-${safeName(file.name)}`;
 
@@ -37,6 +39,8 @@ export async function uploadDocument(form: FormData) {
     type,
     file_url: key,
     file_name: file.name,
+    user_id: ctx.userId,
+    workspace_type: ctx.mode,
   });
 
   // Don't leave an orphaned file in storage if the row didn't save.

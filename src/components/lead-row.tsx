@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { ChevronDown, Plus, Archive, ArrowUpRight } from "lucide-react";
+import { ChevronDown, Plus, Archive, ArrowUpRight, User, Users } from "lucide-react";
 import type { Lead } from "@/lib/leads";
 import { StatusBadge } from "./status-badge";
 import { PriorityGauge } from "./priority-gauge";
+import { toggleLeadWorkspace } from "@/app/(app)/leads/actions";
 
 const rowDate = new Intl.DateTimeFormat("en-US", {
   month: "short",
@@ -28,7 +29,16 @@ function DetailRow({ label, children }: { label: string; children: React.ReactNo
 // expanded "Designhub" row.
 export function LeadRow({ lead, index = 0 }: { lead: Lead; index?: number }) {
   const [expanded, setExpanded] = useState(false);
+  const [isPending, startTransition] = useTransition();
   const toggle = () => setExpanded((v) => !v);
+
+  const handleToggleWorkspace = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const target = lead.workspace_type === "personal" ? "team" : "personal";
+    startTransition(async () => {
+      await toggleLeadWorkspace(lead.id, target);
+    });
+  };
 
   return (
     <>
@@ -127,6 +137,21 @@ export function LeadRow({ lead, index = 0 }: { lead: Lead; index?: number }) {
                           <span className="text-ink-subtle">Not set</span>
                         )}
                       </DetailRow>
+                      <DetailRow label="Workspace Context">
+                        <span className="inline-flex items-center gap-1 font-medium capitalize text-ink">
+                          {lead.workspace_type === "personal" ? (
+                            <>
+                              <User size={12} className="text-accent" />
+                              Personal CRM
+                            </>
+                          ) : (
+                            <>
+                              <Users size={12} className="text-accent" />
+                              Team Workspace
+                            </>
+                          )}
+                        </span>
+                      </DetailRow>
                     </div>
 
                     <div className="min-w-[220px] flex-1">
@@ -158,9 +183,23 @@ export function LeadRow({ lead, index = 0 }: { lead: Lead; index?: number }) {
                     </button>
                     <button
                       type="button"
-                      className="border-line bg-surface text-ink-muted hover:text-ink cursor-pointer rounded-lg border px-3 py-1.5 text-[12px] font-medium transition-colors"
+                      onClick={handleToggleWorkspace}
+                      disabled={isPending}
+                      className={`border-line bg-surface text-ink-muted hover:text-ink flex cursor-pointer items-center gap-1.5 rounded-lg border px-3 py-1.5 text-[12px] font-medium transition-colors ${
+                        isPending ? "opacity-60" : ""
+                      }`}
                     >
-                      Add Note
+                      {lead.workspace_type === "personal" ? (
+                        <>
+                          <Users size={13} strokeWidth={1.75} />
+                          Move to Team Workspace
+                        </>
+                      ) : (
+                        <>
+                          <User size={13} strokeWidth={1.75} />
+                          Move to Personal CRM
+                        </>
+                      )}
                     </button>
                     <button
                       type="button"

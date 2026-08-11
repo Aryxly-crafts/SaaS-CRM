@@ -5,6 +5,7 @@ import type {
   Payment,
   Project,
 } from "@/lib/records";
+import { getWorkspaceContext, applyWorkspaceFilter } from "@/lib/workspace";
 
 // Supabase types embedded relations as arrays; unwrap to a single row.
 function one<T>(relation: unknown): T | null {
@@ -16,24 +17,34 @@ export interface ProjectWithClient extends Project {
   client_name: string;
 }
 
-// Fetches every client, newest first.
+// Fetches every client for active workspace, newest first.
 export async function getClients(): Promise<Client[]> {
   const supabase = await createClient();
-  const { data, error } = await supabase
+  const ctx = await getWorkspaceContext();
+
+  let query = supabase
     .from("clients")
     .select("*")
     .order("created_at", { ascending: false });
+  query = applyWorkspaceFilter(query, ctx);
+
+  const { data, error } = await query;
   if (error) throw error;
   return (data ?? []) as Client[];
 }
 
-// Fetches projects joined with their client's name.
+// Fetches projects for active workspace joined with their client's name.
 export async function getProjects(): Promise<ProjectWithClient[]> {
   const supabase = await createClient();
-  const { data, error } = await supabase
+  const ctx = await getWorkspaceContext();
+
+  let query = supabase
     .from("projects")
     .select("*, clients(legal_name)")
     .order("created_at", { ascending: false });
+  query = applyWorkspaceFilter(query, ctx);
+
+  const { data, error } = await query;
   if (error) throw error;
 
   return (data ?? []).map((row) => {
@@ -50,13 +61,18 @@ export interface PaymentWithProject extends Payment {
   project_title: string;
 }
 
-// Fetches payments joined with their project's title.
+// Fetches payments for active workspace joined with their project's title.
 export async function getPayments(): Promise<PaymentWithProject[]> {
   const supabase = await createClient();
-  const { data, error } = await supabase
+  const ctx = await getWorkspaceContext();
+
+  let query = supabase
     .from("payments")
     .select("*, projects(title)")
     .order("created_at", { ascending: false });
+  query = applyWorkspaceFilter(query, ctx);
+
+  const { data, error } = await query;
   if (error) throw error;
 
   return (data ?? []).map((row) => {
@@ -73,13 +89,18 @@ export interface DocumentWithProject extends DocumentRecord {
   project_title: string;
 }
 
-// Fetches documents joined with their project's title.
+// Fetches documents for active workspace joined with their project's title.
 export async function getDocuments(): Promise<DocumentWithProject[]> {
   const supabase = await createClient();
-  const { data, error } = await supabase
+  const ctx = await getWorkspaceContext();
+
+  let query = supabase
     .from("documents")
     .select("*, projects(title)")
     .order("created_at", { ascending: false });
+  query = applyWorkspaceFilter(query, ctx);
+
+  const { data, error } = await query;
   if (error) throw error;
 
   return (data ?? []).map((row) => {

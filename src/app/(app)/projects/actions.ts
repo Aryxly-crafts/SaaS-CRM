@@ -3,6 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import type { ProjectStatus } from "@/lib/records";
+import { WorkspaceType } from "@/lib/leads";
+import { getWorkspaceContext } from "@/lib/workspace";
 
 // Reads an optional text field, treating blank input as null.
 function text(form: FormData, key: string): string | null {
@@ -50,8 +52,13 @@ export async function createProject(form: FormData) {
   if (!fields.client_id) throw new Error("Pick a client for this project");
   if (!fields.title) throw new Error("Project title is required");
 
+  const ctx = await getWorkspaceContext();
   const supabase = await createClient();
-  const { error } = await supabase.from("projects").insert(fields);
+  const { error } = await supabase.from("projects").insert({
+    ...fields,
+    user_id: ctx.userId,
+    workspace_type: ctx.mode,
+  });
   if (error) throw error;
 
   revalidateProjectViews();
@@ -73,6 +80,20 @@ export async function updateProject(form: FormData) {
   revalidateProjectViews();
 }
 
+// Moves a project between personal and team workspace.
+export async function toggleProjectWorkspace(id: string, workspace_type: WorkspaceType) {
+  const ctx = await getWorkspaceContext();
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("projects")
+    .update({ workspace_type, user_id: ctx.userId })
+    .eq("id", id);
+
+  if (error) throw error;
+
+  revalidateProjectViews();
+}
+
 // Deletes a project along with its payments and documents.
 export async function deleteProject(id: string) {
   const supabase = await createClient();
@@ -87,11 +108,14 @@ export async function createClientRecord(form: FormData) {
   const legal_name = (text(form, "legal_name") ?? "").trim();
   if (!legal_name) throw new Error("Client name is required");
 
+  const ctx = await getWorkspaceContext();
   const supabase = await createClient();
   const { error } = await supabase.from("clients").insert({
     legal_name,
     phone: text(form, "phone"),
     address: text(form, "address"),
+    user_id: ctx.userId,
+    workspace_type: ctx.mode,
   });
   if (error) throw error;
 

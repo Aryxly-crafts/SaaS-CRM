@@ -2,9 +2,17 @@
 
 import { Search, Bell } from "lucide-react";
 import { usePageTitle } from "./page-title-context";
+import { WorkspaceSwitcher } from "@/components/workspace-switcher";
+import type { WorkspaceType } from "@/lib/leads";
 
-// Top bar: page title, global search affordance, notifications, avatar.
-export function TopBar({ userEmail }: { userEmail: string }) {
+// Top bar: page title, global search affordance, workspace switcher, notifications, avatar.
+export function TopBar({
+  userEmail,
+  currentMode,
+}: {
+  userEmail: string;
+  currentMode: WorkspaceType;
+}) {
   const [title] = usePageTitle();
   const initial = userEmail.charAt(0).toUpperCase() || "A";
 
@@ -27,7 +35,11 @@ export function TopBar({ userEmail }: { userEmail: string }) {
         />
       </div>
 
-      <div className="ml-auto flex items-center gap-1.5">
+      <div className="ml-auto flex items-center gap-3">
+        <WorkspaceSwitcher currentMode={currentMode} variant="topbar" />
+
+        <div className="bg-line h-4 w-[1px]" />
+
         <button
           type="button"
           aria-label="Notifications"

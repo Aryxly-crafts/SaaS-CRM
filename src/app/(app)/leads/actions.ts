@@ -2,7 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { calculatePriorityScore, type LeadStatus } from "@/lib/leads";
+import { calculatePriorityScore, type LeadStatus, type WorkspaceType } from "@/lib/leads";
+import { getWorkspaceContext } from "@/lib/workspace";
 
 // Reads an optional text field, treating blank input as null.
 function text(form: FormData, key: string): string | null {
@@ -50,8 +51,13 @@ export async function createLead(form: FormData) {
   const fields = leadFields(form);
   if (!fields.business_name) throw new Error("Business name is required");
 
+  const ctx = await getWorkspaceContext();
   const supabase = await createClient();
-  const { error } = await supabase.from("leads").insert(fields);
+  const { error } = await supabase.from("leads").insert({
+    ...fields,
+    user_id: ctx.userId,
+    workspace_type: ctx.mode,
+  });
   if (error) throw error;
 
   revalidatePath("/leads");
@@ -68,6 +74,21 @@ export async function updateLead(form: FormData) {
 
   const supabase = await createClient();
   const { error } = await supabase.from("leads").update(fields).eq("id", id);
+  if (error) throw error;
+
+  revalidatePath("/leads");
+  revalidatePath("/");
+}
+
+// Moves a lead between personal and team workspace.
+export async function toggleLeadWorkspace(id: string, workspace_type: WorkspaceType) {
+  const ctx = await getWorkspaceContext();
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("leads")
+    .update({ workspace_type, user_id: ctx.userId })
+    .eq("id", id);
+
   if (error) throw error;
 
   revalidatePath("/leads");
@@ -96,11 +117,12 @@ export async function deleteLead(id: string) {
 
 // Converts a won lead into a client record, carrying over its details.
 export async function convertLeadToClient(id: string) {
+  const ctx = await getWorkspaceContext();
   const supabase = await createClient();
 
   const { data: lead, error: readError } = await supabase
     .from("leads")
-    .select("id, business_name, phone, address")
+    .select("id, business_name, phone, address, workspace_type")
     .eq("id", id)
     .single();
   if (readError) throw readError;
@@ -110,6 +132,8 @@ export async function convertLeadToClient(id: string) {
     legal_name: lead.business_name,
     phone: lead.phone,
     address: lead.address,
+    user_id: ctx.userId,
+    workspace_type: lead.workspace_type ?? ctx.mode,
   });
   if (insertError) throw insertError;
 

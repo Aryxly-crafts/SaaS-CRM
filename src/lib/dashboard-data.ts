@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { STATUS_ORDER, type Lead, type LeadStatus } from "@/lib/leads";
+import { getWorkspaceContext, applyWorkspaceFilter } from "@/lib/workspace";
 
 export interface DashboardStats {
   activeLeads: number;
@@ -16,29 +17,42 @@ const ACTIVE_STATUSES: LeadStatus[] = [
   "negotiating",
 ];
 
-// Fetches the 5 dashboard stat-card values from Supabase.
+// Fetches the 5 dashboard stat-card values from Supabase scoped to active workspace.
 export async function getDashboardStats(): Promise<DashboardStats> {
   const supabase = await createClient();
+  const ctx = await getWorkspaceContext();
 
   const startOfMonth = new Date();
   startOfMonth.setDate(1);
   startOfMonth.setHours(0, 0, 0, 0);
   const today = new Date().toISOString().slice(0, 10);
 
+  let activeLeadsQuery = supabase
+    .from("leads")
+    .select("id", { count: "exact", head: true })
+    .in("status", ACTIVE_STATUSES);
+  activeLeadsQuery = applyWorkspaceFilter(activeLeadsQuery, ctx);
+
+  let wonThisMonthQuery = supabase
+    .from("leads")
+    .select("id", { count: "exact", head: true })
+    .eq("status", "won")
+    .gte("created_at", startOfMonth.toISOString());
+  wonThisMonthQuery = applyWorkspaceFilter(wonThisMonthQuery, ctx);
+
+  let paymentsQuery = supabase.from("payments").select("amount");
+  paymentsQuery = applyWorkspaceFilter(paymentsQuery, ctx);
+
+  let projectsQuery = supabase
+    .from("projects")
+    .select("total_value, advance_amount, final_amount, deadline, status");
+  projectsQuery = applyWorkspaceFilter(projectsQuery, ctx);
+
   const [activeLeads, wonThisMonth, payments, projects] = await Promise.all([
-    supabase
-      .from("leads")
-      .select("id", { count: "exact", head: true })
-      .in("status", ACTIVE_STATUSES),
-    supabase
-      .from("leads")
-      .select("id", { count: "exact", head: true })
-      .eq("status", "won")
-      .gte("created_at", startOfMonth.toISOString()),
-    supabase.from("payments").select("amount"),
-    supabase
-      .from("projects")
-      .select("total_value, advance_amount, final_amount, deadline, status"),
+    activeLeadsQuery,
+    wonThisMonthQuery,
+    paymentsQuery,
+    projectsQuery,
   ]);
 
   const revenueCollected = (payments.data ?? []).reduce(
@@ -68,14 +82,18 @@ export async function getDashboardStats(): Promise<DashboardStats> {
   };
 }
 
-// Fetches all leads for the dashboard table, newest first.
+// Fetches all leads for the dashboard table, newest first, scoped to active workspace.
 export async function getLeads(): Promise<Lead[]> {
   const supabase = await createClient();
+  const ctx = await getWorkspaceContext();
 
-  const { data, error } = await supabase
+  let query = supabase
     .from("leads")
     .select("*")
     .order("created_at", { ascending: false });
+  query = applyWorkspaceFilter(query, ctx);
+
+  const { data, error } = await query;
 
   if (error) throw error;
   return (data ?? []) as Lead[];
@@ -89,29 +107,35 @@ export interface TrendPoint {
 
 const TREND_WINDOW_DAYS = 30;
 
-// Builds a continuous day-by-day series for the last 30 days so the chart
-// always has a real axis, filling gaps with zeroes.
+// Builds a continuous day-by-day series for the last 30 days for the active workspace.
 export async function getTrendData(): Promise<{
   points: TrendPoint[];
   hasData: boolean;
 }> {
   const supabase = await createClient();
+  const ctx = await getWorkspaceContext();
 
   const start = new Date();
   start.setHours(0, 0, 0, 0);
   start.setDate(start.getDate() - (TREND_WINDOW_DAYS - 1));
 
+  let wonLeadsQuery = supabase
+    .from("leads")
+    .select("created_at")
+    .eq("status", "won")
+    .gte("created_at", start.toISOString());
+  wonLeadsQuery = applyWorkspaceFilter(wonLeadsQuery, ctx);
+
+  let paymentRowsQuery = supabase
+    .from("payments")
+    .select("amount, paid_date")
+    .not("paid_date", "is", null)
+    .gte("paid_date", start.toISOString().slice(0, 10));
+  paymentRowsQuery = applyWorkspaceFilter(paymentRowsQuery, ctx);
+
   const [wonLeads, paymentRows] = await Promise.all([
-    supabase
-      .from("leads")
-      .select("created_at")
-      .eq("status", "won")
-      .gte("created_at", start.toISOString()),
-    supabase
-      .from("payments")
-      .select("amount, paid_date")
-      .not("paid_date", "is", null)
-      .gte("paid_date", start.toISOString().slice(0, 10)),
+    wonLeadsQuery,
+    paymentRowsQuery,
   ]);
 
   if (wonLeads.error) throw wonLeads.error;
@@ -152,11 +176,15 @@ export interface PipelineStage {
   count: number;
 }
 
-// Counts leads per status so the pipeline panel can show a breakdown bar.
+// Counts leads per status for active workspace.
 export async function getPipelineBreakdown(): Promise<PipelineStage[]> {
   const supabase = await createClient();
+  const ctx = await getWorkspaceContext();
 
-  const { data, error } = await supabase.from("leads").select("status");
+  let query = supabase.from("leads").select("status");
+  query = applyWorkspaceFilter(query, ctx);
+
+  const { data, error } = await query;
   if (error) throw error;
 
   const counts = new Map<LeadStatus, number>();
@@ -182,12 +210,13 @@ const deadlineFormat = new Intl.DateTimeFormat("en-US", {
   day: "numeric",
 });
 
-// The next five project deadlines that haven't passed.
+// The next five project deadlines for active workspace.
 export async function getUpcomingDeadlines(): Promise<DeadlineItem[]> {
   const supabase = await createClient();
+  const ctx = await getWorkspaceContext();
   const today = new Date().toISOString().slice(0, 10);
 
-  const { data, error } = await supabase
+  let query = supabase
     .from("projects")
     .select("id, title, deadline, clients(legal_name)")
     .neq("status", "completed")
@@ -195,6 +224,9 @@ export async function getUpcomingDeadlines(): Promise<DeadlineItem[]> {
     .gte("deadline", today)
     .order("deadline", { ascending: true })
     .limit(5);
+  query = applyWorkspaceFilter(query, ctx);
+
+  const { data, error } = await query;
 
   if (error) throw error;
 
@@ -230,15 +262,19 @@ function timeAgo(iso: string): string {
   return relative.format(-Math.round(hours / 24), "day");
 }
 
-// Most recently created leads, shown as the activity feed.
+// Most recently created leads for active workspace.
 export async function getRecentActivity(): Promise<ActivityItem[]> {
   const supabase = await createClient();
+  const ctx = await getWorkspaceContext();
 
-  const { data, error } = await supabase
+  let query = supabase
     .from("leads")
     .select("id, business_name, status, created_at")
     .order("created_at", { ascending: false })
     .limit(5);
+  query = applyWorkspaceFilter(query, ctx);
+
+  const { data, error } = await query;
 
   if (error) throw error;
 

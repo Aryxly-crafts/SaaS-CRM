@@ -14,6 +14,8 @@ import {
   LogOut,
 } from "lucide-react";
 import { signOut } from "./actions";
+import { WorkspaceSwitcher } from "@/components/workspace-switcher";
+import type { WorkspaceType } from "@/lib/leads";
 
 const PRIMARY_NAV = [
   { href: "/", label: "Overview", icon: LayoutDashboard },
@@ -72,14 +74,20 @@ function NavLink({
   );
 }
 
-// Left navigation — grouped sections, animated active state, account footer.
-export function Sidebar({ userEmail }: { userEmail: string }) {
+// Left navigation — grouped sections, animated active state, workspace switcher, account footer.
+export function Sidebar({
+  userEmail,
+  currentMode,
+}: {
+  userEmail: string;
+  currentMode: WorkspaceType;
+}) {
   const pathname = usePathname();
   const initial = userEmail.charAt(0).toUpperCase() || "A";
 
   return (
     <nav className="bg-canvas border-line scroll-hidden hidden w-[228px] flex-shrink-0 flex-col overflow-y-auto border-r px-3 py-5 md:flex">
-      <div className="mb-7 flex items-center gap-2 px-2">
+      <div className="mb-4 flex items-center gap-2 px-2">
         <Image
           src="/logo-mark.png"
           alt=""
@@ -91,6 +99,10 @@ export function Sidebar({ userEmail }: { userEmail: string }) {
         <span className="text-ink text-[15px] font-semibold tracking-tight">
           Aryxly
         </span>
+      </div>
+
+      <div className="mb-5 px-1">
+        <WorkspaceSwitcher currentMode={currentMode} variant="sidebar" />
       </div>
 
       <ul className="flex flex-col gap-0.5">
