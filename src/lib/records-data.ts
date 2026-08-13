@@ -29,7 +29,10 @@ export async function getClients(): Promise<Client[]> {
   query = applyWorkspaceFilter(query, ctx);
 
   const { data, error } = await query;
-  if (error) throw error;
+  if (error) {
+    console.error("getClients query error:", error.message);
+    return [];
+  }
   return (data ?? []) as Client[];
 }
 
@@ -45,7 +48,10 @@ export async function getProjects(): Promise<ProjectWithClient[]> {
   query = applyWorkspaceFilter(query, ctx);
 
   const { data, error } = await query;
-  if (error) throw error;
+  if (error) {
+    console.error("getProjects query error:", error.message);
+    return [];
+  }
 
   return (data ?? []).map((row) => {
     const { clients, ...project } = row as Record<string, unknown>;
@@ -73,7 +79,10 @@ export async function getPayments(): Promise<PaymentWithProject[]> {
   query = applyWorkspaceFilter(query, ctx);
 
   const { data, error } = await query;
-  if (error) throw error;
+  if (error) {
+    console.error("getPayments query error:", error.message);
+    return [];
+  }
 
   return (data ?? []).map((row) => {
     const { projects, ...payment } = row as Record<string, unknown>;
@@ -101,7 +110,10 @@ export async function getDocuments(): Promise<DocumentWithProject[]> {
   query = applyWorkspaceFilter(query, ctx);
 
   const { data, error } = await query;
-  if (error) throw error;
+  if (error) {
+    console.error("getDocuments query error:", error.message);
+    return [];
+  }
 
   return (data ?? []).map((row) => {
     const { projects, ...document } = row as Record<string, unknown>;

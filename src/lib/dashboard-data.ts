@@ -95,7 +95,10 @@ export async function getLeads(): Promise<Lead[]> {
 
   const { data, error } = await query;
 
-  if (error) throw error;
+  if (error) {
+    console.error("getLeads query error:", error.message);
+    return [];
+  }
   return (data ?? []) as Lead[];
 }
 
@@ -138,8 +141,12 @@ export async function getTrendData(): Promise<{
     paymentRowsQuery,
   ]);
 
-  if (wonLeads.error) throw wonLeads.error;
-  if (paymentRows.error) throw paymentRows.error;
+  if (wonLeads.error) {
+    console.error("getTrendData wonLeads query error:", wonLeads.error.message);
+  }
+  if (paymentRows.error) {
+    console.error("getTrendData paymentRows query error:", paymentRows.error.message);
+  }
 
   const wonByDate = new Map<string, number>();
   for (const row of wonLeads.data ?? []) {
@@ -185,7 +192,10 @@ export async function getPipelineBreakdown(): Promise<PipelineStage[]> {
   query = applyWorkspaceFilter(query, ctx);
 
   const { data, error } = await query;
-  if (error) throw error;
+  if (error) {
+    console.error("getPipelineBreakdown query error:", error.message);
+    return STATUS_ORDER.map((status) => ({ status, count: 0 }));
+  }
 
   const counts = new Map<LeadStatus, number>();
   for (const row of data ?? []) {
@@ -228,7 +238,10 @@ export async function getUpcomingDeadlines(): Promise<DeadlineItem[]> {
 
   const { data, error } = await query;
 
-  if (error) throw error;
+  if (error) {
+    console.error("getUpcomingDeadlines query error:", error.message);
+    return [];
+  }
 
   return (data ?? []).map((row) => {
     const relation = row.clients as unknown;
@@ -276,7 +289,10 @@ export async function getRecentActivity(): Promise<ActivityItem[]> {
 
   const { data, error } = await query;
 
-  if (error) throw error;
+  if (error) {
+    console.error("getRecentActivity query error:", error.message);
+    return [];
+  }
 
   return (data ?? []).map((row) => ({
     id: row.id as string,
