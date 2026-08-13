@@ -53,12 +53,26 @@ export async function createLead(form: FormData) {
 
   const ctx = await getWorkspaceContext();
   const supabase = await createClient();
-  const { error } = await supabase.from("leads").insert({
+  let { error } = await supabase.from("leads").insert({
     ...fields,
     user_id: ctx.userId,
     workspace_type: ctx.mode,
   });
-  if (error) throw error;
+
+  // Fallback if workspace_type column is missing before SQL migration runs
+  if (error && (error.code === "PGRST204" || error.message?.includes("workspace_type"))) {
+    const res = await supabase.from("leads").insert(fields);
+    error = res.error;
+  }
+
+  if (error) {
+    if (error.code === "42501") {
+      throw new Error(
+        "Database security policy blocking access. Please run the SQL migration script in your Supabase SQL Editor."
+      );
+    }
+    throw new Error(error.message || "Failed to create lead");
+  }
 
   revalidatePath("/leads");
   revalidatePath("/");
@@ -74,7 +88,14 @@ export async function updateLead(form: FormData) {
 
   const supabase = await createClient();
   const { error } = await supabase.from("leads").update(fields).eq("id", id);
-  if (error) throw error;
+  if (error) {
+    if (error.code === "42501") {
+      throw new Error(
+        "Database security policy blocking access. Please run the SQL migration script in your Supabase SQL Editor."
+      );
+    }
+    throw new Error(error.message || "Failed to update lead");
+  }
 
   revalidatePath("/leads");
   revalidatePath("/");
