@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "motion/react";
-import { Sparkles, Radio, CheckCircle, Wallet, FolderKanban, Receipt, X } from "lucide-react";
+import { Sparkles, Wallet, FolderKanban, Receipt, X } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
 interface LiveToast {
@@ -16,7 +16,6 @@ interface LiveToast {
 export function RealtimeListener() {
   const router = useRouter();
   const [toasts, setToasts] = useState<LiveToast[]>([]);
-  const [connected, setConnected] = useState(false);
 
   const addToast = (toast: Omit<LiveToast, "id">) => {
     const id = `${Date.now()}-${Math.random()}`;
@@ -32,8 +31,16 @@ export function RealtimeListener() {
 
   useEffect(() => {
     const supabase = createClient();
+    let debounceTimer: NodeJS.Timeout | null = null;
 
-    // Global Realtime WebSocket channel listening to all database tables
+    const debouncedRefresh = () => {
+      if (debounceTimer) clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        router.refresh();
+      }, 350);
+    };
+
+    // Global Realtime channel with debounced refreshes
     const channel = supabase
       .channel("crm-realtime-sync")
       .on(
@@ -41,16 +48,14 @@ export function RealtimeListener() {
         { event: "*", schema: "public", table: "leads" },
         (payload) => {
           if (payload.eventType === "INSERT") {
-            const lead = payload.new as any;
+            const lead = payload.new as Record<string, unknown>;
             addToast({
               type: "lead",
               title: "New Lead Ingested",
-              subtitle: `${lead.business_name || "Unknown business"} ${
-                lead.category ? `(${lead.category})` : ""
-              }`,
+              subtitle: `${String(lead.business_name || "Unknown")} ${lead.category ? `(${String(lead.category)})` : ""}`,
             });
           }
-          router.refresh();
+          debouncedRefresh();
         }
       )
       .on(
@@ -58,14 +63,14 @@ export function RealtimeListener() {
         { event: "*", schema: "public", table: "payments" },
         (payload) => {
           if (payload.eventType === "INSERT") {
-            const payment = payload.new as any;
+            const payment = payload.new as Record<string, unknown>;
             addToast({
               type: "payment",
               title: "Payment Received",
               subtitle: `Amount: ₹${Number(payment.amount || 0).toLocaleString("en-IN")}`,
             });
           }
-          router.refresh();
+          debouncedRefresh();
         }
       )
       .on(
@@ -73,14 +78,14 @@ export function RealtimeListener() {
         { event: "*", schema: "public", table: "expenses" },
         (payload) => {
           if (payload.eventType === "INSERT") {
-            const expense = payload.new as any;
+            const expense = payload.new as Record<string, unknown>;
             addToast({
               type: "expense",
               title: "Expense Logged",
-              subtitle: `${expense.title} — ₹${Number(expense.amount || 0).toLocaleString("en-IN")}`,
+              subtitle: `${String(expense.title || "Expense")} — ₹${Number(expense.amount || 0).toLocaleString("en-IN")}`,
             });
           }
-          router.refresh();
+          debouncedRefresh();
         }
       )
       .on(
@@ -88,32 +93,27 @@ export function RealtimeListener() {
         { event: "*", schema: "public", table: "projects" },
         (payload) => {
           if (payload.eventType === "INSERT" || payload.eventType === "UPDATE") {
-            const project = payload.new as any;
+            const project = payload.new as Record<string, unknown>;
             addToast({
               type: "project",
               title: payload.eventType === "INSERT" ? "New Project" : "Project Updated",
-              subtitle: project.title || "Project details updated",
+              subtitle: String(project.title || "Project details updated"),
             });
           }
-          router.refresh();
+          debouncedRefresh();
         }
       )
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "clients" },
         () => {
-          router.refresh();
+          debouncedRefresh();
         }
       )
-      .subscribe((status) => {
-        if (status === "SUBSCRIBED") {
-          setConnected(true);
-        } else if (status === "CLOSED" || status === "CHANNEL_ERROR") {
-          setConnected(false);
-        }
-      });
+      .subscribe();
 
     return () => {
+      if (debounceTimer) clearTimeout(debounceTimer);
       supabase.removeChannel(channel);
     };
   }, [router]);

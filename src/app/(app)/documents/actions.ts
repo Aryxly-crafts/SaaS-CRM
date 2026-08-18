@@ -52,12 +52,16 @@ export async function uploadDocument(form: FormData) {
   revalidatePath("/documents");
 }
 
-// Removes a document. The row goes first so a storage failure can't leave
-// a record pointing at a file that no longer exists.
+// Removes a document scoped to active workspace.
 export async function deleteDocument(id: string, fileUrl: string) {
+  const ctx = await getWorkspaceContext();
   const supabase = await createClient();
 
-  const { error } = await supabase.from("documents").delete().eq("id", id);
+  let query = supabase.from("documents").delete().eq("id", id).eq("workspace_type", ctx.mode);
+  if (ctx.mode === "personal" && ctx.userId) {
+    query = query.eq("user_id", ctx.userId);
+  }
+  const { error } = await query;
   if (error) throw error;
 
   await supabase.storage.from(BUCKET).remove([fileUrl]);

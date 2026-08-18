@@ -216,3 +216,50 @@ export function isOverdue(project: Pick<Project, "deadline" | "status">) {
   if (!project.deadline || project.status === "completed") return false;
   return new Date(project.deadline).getTime() < Date.now();
 }
+
+export type BudgetScope = "project" | "category" | "savings";
+export type BudgetPeriod = "monthly" | "project" | "annual";
+
+export interface Budget {
+  id: string;
+  scope: BudgetScope;
+  project_id: string | null;
+  category: ExpenseCategory | null;
+  amount: number;
+  period: BudgetPeriod;
+  period_start: string;
+  notes: string | null;
+  workspace_type?: WorkspaceType;
+  user_id?: string | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface BudgetWithMeta extends Budget {
+  project_title?: string | null;
+  actual_spend: number;
+  variance: number;
+  percentage_used: number;
+}
+
+export interface AIInsightItem {
+  id: string;
+  category: "deal_alignment" | "margin_risk" | "savings_boost" | "spending_leak" | "cost_optimization";
+  title: string;
+  severity: "critical" | "warning" | "optimization" | "positive";
+  finding: string;
+  recommendation: string;
+  impact_amount?: number;
+}
+
+export interface AIInsightRecord {
+  id: string;
+  workspace_type: WorkspaceType;
+  user_id: string | null;
+  fingerprint: string;
+  insights: AIInsightItem[];
+  summary: string;
+  health_score: number;
+  created_at: string;
+}
+

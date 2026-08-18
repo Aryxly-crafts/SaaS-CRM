@@ -53,7 +53,7 @@ export async function createPayment(form: FormData) {
   revalidatePaymentViews();
 }
 
-// Updates an existing payment.
+// Updates an existing payment scoped to active workspace.
 export async function updatePayment(form: FormData) {
   const id = form.get("id");
   if (typeof id !== "string") throw new Error("Missing payment id");
@@ -64,17 +64,27 @@ export async function updatePayment(form: FormData) {
     throw new Error("Enter a payment amount greater than zero");
   }
 
+  const ctx = await getWorkspaceContext();
   const supabase = await createClient();
-  const { error } = await supabase.from("payments").update(fields).eq("id", id);
+  let query = supabase.from("payments").update(fields).eq("id", id).eq("workspace_type", ctx.mode);
+  if (ctx.mode === "personal" && ctx.userId) {
+    query = query.eq("user_id", ctx.userId);
+  }
+  const { error } = await query;
   if (error) throw error;
 
   revalidatePaymentViews();
 }
 
-// Deletes a payment record.
+// Deletes a payment record scoped to active workspace.
 export async function deletePayment(id: string) {
+  const ctx = await getWorkspaceContext();
   const supabase = await createClient();
-  const { error } = await supabase.from("payments").delete().eq("id", id);
+  let query = supabase.from("payments").delete().eq("id", id).eq("workspace_type", ctx.mode);
+  if (ctx.mode === "personal" && ctx.userId) {
+    query = query.eq("user_id", ctx.userId);
+  }
+  const { error } = await query;
   if (error) throw error;
 
   revalidatePaymentViews();

@@ -117,6 +117,14 @@ export function EmptyState({
 const FIELD_BASE =
   "border-line bg-surface-muted text-ink placeholder:text-ink-subtle focus:border-accent focus:bg-surface w-full rounded-lg border px-3 py-2 text-body-md transition-colors focus:ring-2 focus:ring-[var(--accent)]/15 focus:outline-none";
 
+// Bare input styled with standard field base.
+export function Input({
+  className = "",
+  ...props
+}: React.InputHTMLAttributes<HTMLInputElement>) {
+  return <input {...props} className={`${FIELD_BASE} ${className}`} />;
+}
+
 // Labelled text input for forms.
 export function Field({
   label,

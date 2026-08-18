@@ -100,6 +100,19 @@ export async function searchAllRecords(query: string): Promise<SearchResultItem[
     });
   }
 
+  // Payments
+  for (const pay of paymentsRes.data ?? []) {
+    const project = Array.isArray(pay.projects) ? pay.projects[0] : pay.projects;
+    results.push({
+      id: `payment-${pay.id}`,
+      type: "payment",
+      title: `Payment: ₹${Number(pay.amount).toLocaleString("en-IN")}`,
+      subtitle: (project as { title: string } | null)?.title ? `Project: ${(project as { title: string }).title}` : `Type: ${pay.type}`,
+      meta: pay.type?.toUpperCase(),
+      href: "/payments",
+    });
+  }
+
   // Expenses
   for (const exp of expensesRes.data ?? []) {
     results.push({

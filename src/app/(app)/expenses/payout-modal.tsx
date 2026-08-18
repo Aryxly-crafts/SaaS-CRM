@@ -7,6 +7,8 @@ import { Button, Field, SelectField } from "@/components/ui";
 import type { ProjectWithClient } from "@/lib/records-data";
 import { getProjectFinancials, distributeProjectPayout } from "./payout-actions";
 
+type FinancialData = Awaited<ReturnType<typeof getProjectFinancials>>;
+
 export function FounderPayoutModal({
   projects,
 }: {
@@ -14,7 +16,7 @@ export function FounderPayoutModal({
 }) {
   const [open, setOpen] = useState(false);
   const [selectedProjectId, setSelectedProjectId] = useState(projects[0]?.id || "");
-  const [financials, setFinancials] = useState<any>(null);
+  const [financials, setFinancials] = useState<FinancialData | null>(null);
   const [loadingFinancials, setLoadingFinancials] = useState(false);
 
   const [akshithShare, setAkshithShare] = useState<number>(0);
@@ -25,21 +27,33 @@ export function FounderPayoutModal({
   const [success, setSuccess] = useState(false);
   const [pending, startTransition] = useTransition();
 
-  // Load project financials when project changes
+  // Load project financials when project or modal visibility changes
   useEffect(() => {
     if (!selectedProjectId || !open) return;
-    setLoadingFinancials(true);
-    setError(null);
-    getProjectFinancials(selectedProjectId)
-      .then((data) => {
+    let active = true;
+
+    async function loadData() {
+      setLoadingFinancials(true);
+      setError(null);
+      try {
+        const data = await getProjectFinancials(selectedProjectId);
+        if (!active) return;
         setFinancials(data);
         const margin = data.remainingDistributable || data.netMargin || 0;
         const half = Math.floor(margin / 2);
         setAkshithShare(half);
         setYashashwiniShare(margin - half);
-      })
-      .catch((err) => setError(err.message))
-      .finally(() => setLoadingFinancials(false));
+      } catch (err: unknown) {
+        if (active) setError(err instanceof Error ? err.message : "Failed to load project financials");
+      } finally {
+        if (active) setLoadingFinancials(false);
+      }
+    }
+
+    loadData();
+    return () => {
+      active = false;
+    };
   }, [selectedProjectId, open]);
 
   const handleRatioChange = (ratio: "50_50" | "custom") => {
@@ -83,8 +97,8 @@ export function FounderPayoutModal({
           setSuccess(false);
           setOpen(false);
         }, 1500);
-      } catch (err: any) {
-        setError(err.message || "Failed to distribute payout");
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : "Failed to distribute payout");
       }
     });
   };
@@ -93,8 +107,6 @@ export function FounderPayoutModal({
     value: p.id,
     label: `${p.client_name} — ${p.title}`,
   }));
-
-  const selectedProject = projects.find((p) => p.id === selectedProjectId);
 
   return (
     <>

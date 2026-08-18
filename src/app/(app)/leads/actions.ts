@@ -78,7 +78,7 @@ export async function createLead(form: FormData) {
   revalidatePath("/");
 }
 
-// Updates an existing lead and recalculates its priority score.
+// Updates an existing lead and recalculates its priority score scoped to active workspace.
 export async function updateLead(form: FormData) {
   const id = form.get("id");
   if (typeof id !== "string") throw new Error("Missing lead id");
@@ -86,8 +86,13 @@ export async function updateLead(form: FormData) {
   const fields = leadFields(form);
   if (!fields.business_name) throw new Error("Business name is required");
 
+  const ctx = await getWorkspaceContext();
   const supabase = await createClient();
-  const { error } = await supabase.from("leads").update(fields).eq("id", id);
+  let query = supabase.from("leads").update(fields).eq("id", id).eq("workspace_type", ctx.mode);
+  if (ctx.mode === "personal" && ctx.userId) {
+    query = query.eq("user_id", ctx.userId);
+  }
+  const { error } = await query;
   if (error) {
     if (error.code === "42501") {
       throw new Error(
@@ -116,20 +121,30 @@ export async function toggleLeadWorkspace(id: string, workspace_type: WorkspaceT
   revalidatePath("/");
 }
 
-// Moves a lead to a new pipeline status.
+// Moves a lead to a new pipeline status scoped to workspace.
 export async function setLeadStatus(id: string, status: LeadStatus) {
+  const ctx = await getWorkspaceContext();
   const supabase = await createClient();
-  const { error } = await supabase.from("leads").update({ status }).eq("id", id);
+  let query = supabase.from("leads").update({ status }).eq("id", id).eq("workspace_type", ctx.mode);
+  if (ctx.mode === "personal" && ctx.userId) {
+    query = query.eq("user_id", ctx.userId);
+  }
+  const { error } = await query;
   if (error) throw error;
 
   revalidatePath("/leads");
   revalidatePath("/");
 }
 
-// Deletes a lead permanently.
+// Deletes a lead permanently scoped to workspace.
 export async function deleteLead(id: string) {
+  const ctx = await getWorkspaceContext();
   const supabase = await createClient();
-  const { error } = await supabase.from("leads").delete().eq("id", id);
+  let query = supabase.from("leads").delete().eq("id", id).eq("workspace_type", ctx.mode);
+  if (ctx.mode === "personal" && ctx.userId) {
+    query = query.eq("user_id", ctx.userId);
+  }
+  const { error } = await query;
   if (error) throw error;
 
   revalidatePath("/leads");

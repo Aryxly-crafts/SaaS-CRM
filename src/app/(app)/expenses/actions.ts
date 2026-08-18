@@ -55,7 +55,7 @@ export async function createExpense(form: FormData) {
   revalidateExpenseViews();
 }
 
-// Updates an existing expense entry.
+// Updates an existing expense entry scoped to the active workspace.
 export async function updateExpense(form: FormData) {
   const id = form.get("id");
   if (typeof id !== "string") throw new Error("Missing expense id");
@@ -66,17 +66,27 @@ export async function updateExpense(form: FormData) {
     throw new Error("Enter an amount greater than zero");
   }
 
+  const ctx = await getWorkspaceContext();
   const supabase = await createClient();
-  const { error } = await supabase.from("expenses").update(fields).eq("id", id);
+  let query = supabase.from("expenses").update(fields).eq("id", id).eq("workspace_type", ctx.mode);
+  if (ctx.mode === "personal" && ctx.userId) {
+    query = query.eq("user_id", ctx.userId);
+  }
+  const { error } = await query;
   if (error) throw error;
 
   revalidateExpenseViews();
 }
 
-// Deletes an expense entry.
+// Deletes an expense entry scoped to the active workspace.
 export async function deleteExpense(id: string) {
+  const ctx = await getWorkspaceContext();
   const supabase = await createClient();
-  const { error } = await supabase.from("expenses").delete().eq("id", id);
+  let query = supabase.from("expenses").delete().eq("id", id).eq("workspace_type", ctx.mode);
+  if (ctx.mode === "personal" && ctx.userId) {
+    query = query.eq("user_id", ctx.userId);
+  }
+  const { error } = await query;
   if (error) throw error;
 
   revalidateExpenseViews();

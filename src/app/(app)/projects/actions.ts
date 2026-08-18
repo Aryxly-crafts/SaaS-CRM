@@ -64,7 +64,7 @@ export async function createProject(form: FormData) {
   revalidateProjectViews();
 }
 
-// Updates an existing project.
+// Updates an existing project scoped to active workspace.
 export async function updateProject(form: FormData) {
   const id = form.get("id");
   if (typeof id !== "string") throw new Error("Missing project id");
@@ -73,8 +73,13 @@ export async function updateProject(form: FormData) {
   if (!fields.client_id) throw new Error("Pick a client for this project");
   if (!fields.title) throw new Error("Project title is required");
 
+  const ctx = await getWorkspaceContext();
   const supabase = await createClient();
-  const { error } = await supabase.from("projects").update(fields).eq("id", id);
+  let query = supabase.from("projects").update(fields).eq("id", id).eq("workspace_type", ctx.mode);
+  if (ctx.mode === "personal" && ctx.userId) {
+    query = query.eq("user_id", ctx.userId);
+  }
+  const { error } = await query;
   if (error) throw error;
 
   revalidateProjectViews();
@@ -94,10 +99,15 @@ export async function toggleProjectWorkspace(id: string, workspace_type: Workspa
   revalidateProjectViews();
 }
 
-// Deletes a project along with its payments and documents.
+// Deletes a project along with its payments and documents scoped to workspace.
 export async function deleteProject(id: string) {
+  const ctx = await getWorkspaceContext();
   const supabase = await createClient();
-  const { error } = await supabase.from("projects").delete().eq("id", id);
+  let query = supabase.from("projects").delete().eq("id", id).eq("workspace_type", ctx.mode);
+  if (ctx.mode === "personal" && ctx.userId) {
+    query = query.eq("user_id", ctx.userId);
+  }
+  const { error } = await query;
   if (error) throw error;
 
   revalidateProjectViews();

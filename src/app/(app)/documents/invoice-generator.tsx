@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition, useRef } from "react";
-import { FileSpreadsheet, Printer, Plus, Trash2, CheckCircle2, Loader2, Sparkles } from "lucide-react";
+import { FileSpreadsheet, Printer, Plus, Trash2, CheckCircle2, Loader2 } from "lucide-react";
 import { Modal } from "@/components/modal";
 import { Button, Field, SelectField } from "@/components/ui";
 import type { ProjectWithClient } from "@/lib/records-data";
@@ -23,11 +23,11 @@ export function InvoiceGeneratorModal({
   const [selectedProjectId, setSelectedProjectId] = useState(projects[0]?.id || "");
   const [docType, setDocType] = useState<"invoice" | "sow">("invoice");
   const [docNumber, setDocNumber] = useState(
-    `ARYXLY-INV-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`
+    () => `ARYXLY-INV-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`
   );
-  const [issueDate, setIssueDate] = useState(new Date().toISOString().slice(0, 10));
+  const [issueDate, setIssueDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [dueDate, setDueDate] = useState(
-    new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10)
+    () => new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10)
   );
 
   const selectedProject = projects.find((p) => p.id === selectedProjectId);
@@ -41,9 +41,6 @@ export function InvoiceGeneratorModal({
     },
   ]);
 
-  const [notes, setNotes] = useState(
-    "Payment via UPI or Bank Transfer within 14 days. Thank you for your business!"
-  );
   const [savedSuccess, setSavedSuccess] = useState(false);
   const [pending, startTransition] = useTransition();
   const printRef = useRef<HTMLDivElement>(null);
@@ -67,7 +64,7 @@ export function InvoiceGeneratorModal({
     setLineItems((prev) => prev.filter((item) => item.id !== id));
   };
 
-  const updateLineItem = (id: string, field: keyof LineItem, value: any) => {
+  const updateLineItem = (id: string, field: keyof LineItem, value: string | number) => {
     setLineItems((prev) =>
       prev.map((item) => (item.id === id ? { ...item, [field]: value } : item))
     );
@@ -88,8 +85,8 @@ export function InvoiceGeneratorModal({
           setSavedSuccess(false);
           setOpen(false);
         }, 1200);
-      } catch (err: any) {
-        alert(err.message || "Failed to save invoice record.");
+      } catch (err: unknown) {
+        alert(err instanceof Error ? err.message : "Failed to save invoice record.");
       }
     });
   };
@@ -128,7 +125,7 @@ export function InvoiceGeneratorModal({
                 { value: "sow", label: "Scope of Work (SOW)" },
               ]}
               value={docType}
-              onChange={(e) => setDocType(e.target.value as any)}
+              onChange={(e) => setDocType(e.target.value as "invoice" | "sow")}
             />
             <SelectField
               label="Select Project"

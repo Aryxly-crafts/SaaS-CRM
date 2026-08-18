@@ -13,12 +13,15 @@ export async function signOut() {
   redirect("/login");
 }
 
-// Switches the active workspace mode (personal vs team) for the session.
-export async function setWorkspaceMode(mode: WorkspaceType) {
+// Switches active workspace mode and revalidates the current route without nuking the layout.
+export async function setWorkspaceMode(mode: WorkspaceType, currentPath: string = "/") {
   const cookieStore = await cookies();
   cookieStore.set("workspace_mode", mode, {
     path: "/",
     maxAge: 60 * 60 * 24 * 365,
   });
-  revalidatePath("/", "layout");
+  if (currentPath && currentPath !== "/") {
+    revalidatePath(currentPath);
+  }
+  revalidatePath("/");
 }

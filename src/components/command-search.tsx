@@ -11,7 +11,6 @@ import {
   Receipt,
   Wallet,
   ArrowRight,
-  Command,
   Loader2,
   X,
 } from "lucide-react";
@@ -29,6 +28,13 @@ export function CommandSearch({
   const [isSearching, startTransition] = useTransition();
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+
+  const handleClose = () => {
+    setOpen(false);
+    setQuery("");
+    setResults([]);
+    setSelectedIndex(0);
+  };
 
   // Global keyboard shortcut listener: Ctrl+K / Cmd+K / Slash
   useEffect(() => {
@@ -49,24 +55,17 @@ export function CommandSearch({
   useEffect(() => {
     if (open) {
       setTimeout(() => inputRef.current?.focus(), 50);
-    } else {
-      setQuery("");
-      setResults([]);
-      setSelectedIndex(0);
     }
   }, [open]);
 
   // Live debounced search
   useEffect(() => {
-    if (!query.trim()) {
-      setResults([]);
-      setSelectedIndex(0);
-      return;
-    }
+    const trimmed = query.trim();
+    if (!trimmed) return;
 
     const timer = setTimeout(() => {
       startTransition(async () => {
-        const res = await searchAllRecords(query);
+        const res = await searchAllRecords(trimmed);
         setResults(res);
         setSelectedIndex(0);
       });
@@ -75,8 +74,16 @@ export function CommandSearch({
     return () => clearTimeout(timer);
   }, [query]);
 
+  const handleQueryChange = (val: string) => {
+    setQuery(val);
+    if (!val.trim()) {
+      setResults([]);
+      setSelectedIndex(0);
+    }
+  };
+
   const handleSelect = (item: SearchResultItem) => {
-    setOpen(false);
+    handleClose();
     router.push(item.href);
   };
 
@@ -130,7 +137,7 @@ export function CommandSearch({
                 <input
                   ref={inputRef}
                   value={query}
-                  onChange={(e) => setQuery(e.target.value)}
+                  onChange={(e) => handleQueryChange(e.target.value)}
                   onKeyDown={handleInputKeyDown}
                   placeholder="Type to search leads, projects, clients, expenses…"
                   className="text-ink placeholder:text-ink-subtle flex-1 bg-transparent text-[14px] outline-none"
@@ -138,7 +145,7 @@ export function CommandSearch({
                 {isSearching && <Loader2 size={16} className="animate-spin text-accent" />}
                 <button
                   type="button"
-                  onClick={() => setOpen(false)}
+                  onClick={handleClose}
                   className="text-ink-subtle hover:text-ink rounded p-1"
                 >
                   <X size={15} />
