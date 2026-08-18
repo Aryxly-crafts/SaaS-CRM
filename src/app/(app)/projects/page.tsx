@@ -11,6 +11,8 @@ import { Card, EmptyState, PageHeader } from "@/components/ui";
 import { ProjectForm } from "./project-form";
 import { ClientForm } from "./client-form";
 import { ProjectRowMenu } from "./project-row-menu";
+import { InvoiceGeneratorModal } from "../documents/invoice-generator";
+import { FounderPayoutModal } from "../expenses/payout-modal";
 
 // Project tracking screen with per-row edit and delete.
 export default async function ProjectsPage() {
@@ -23,7 +25,9 @@ export default async function ProjectsPage() {
         title="Projects"
         description={`${projects.length} project${projects.length === 1 ? "" : "s"} across ${clients.length} client${clients.length === 1 ? "" : "s"}`}
         action={
-          <div className="flex gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <InvoiceGeneratorModal projects={projects} />
+            <FounderPayoutModal projects={projects} />
             <ClientForm />
             <ProjectForm clients={clients} />
           </div>

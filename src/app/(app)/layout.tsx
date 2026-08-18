@@ -4,6 +4,7 @@ import { Sidebar } from "./sidebar";
 import { PageTitleProvider } from "./page-title-context";
 import { TopBar } from "./top-bar";
 import { PageTransition } from "./page-transition";
+import { RealtimeListener } from "@/components/realtime-listener";
 
 // Shared shell for every authenticated screen: sidebar, top bar, and a
 // scrolling content column that fills the viewport edge to edge.
@@ -31,6 +32,7 @@ export default async function AppLayout({
           </main>
         </div>
       </div>
+      <RealtimeListener />
     </PageTitleProvider>
   );
 }

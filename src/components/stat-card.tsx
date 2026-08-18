@@ -9,7 +9,7 @@ export interface StatDelta {
   direction: "up" | "down" | "flat";
 }
 
-// Splits a formatted value like "$88,400" into its prefix and numeric part
+// Splits a formatted value like "₹88,400" into its prefix and numeric part
 // so only the number animates.
 function parseValue(value: string | number) {
   const text = String(value);
@@ -56,24 +56,32 @@ function AnimatedValue({ value }: { value: string | number }) {
   return (
     <span ref={ref}>
       {parsed.prefix}
-      {rounded.toLocaleString()}
+      {rounded.toLocaleString("en-IN")}
       {parsed.suffix}
     </span>
   );
 }
 
-// Single stat tile: label, animated value, and a delta chip when history exists.
+// Single stat tile: label, animated value, accent colouring, and optional delta.
 export function StatCard({
   label,
   value,
   delta,
+  accent,
   index,
 }: {
   label: string;
   value: string | number;
   delta?: StatDelta;
+  accent?: "danger" | "positive";
   index: number;
 }) {
+  const valueColor = accent === "danger"
+    ? "text-danger"
+    : accent === "positive"
+      ? "text-positive"
+      : "text-ink";
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
@@ -85,9 +93,9 @@ export function StatCard({
       }}
       className="hover:bg-surface-muted flex flex-col gap-1.5 px-4 py-3.5 transition-colors"
     >
-      <p className="text-ink-muted truncate text-[12px]">{label}</p>
+      <p className="text-ink-subtle text-label-md truncate">{label}</p>
       <div className="flex items-baseline gap-1.5">
-        <span className="text-ink tabular text-[19px] leading-none font-semibold tracking-tight">
+        <span className={`tabular text-[20px] leading-none font-semibold tracking-tight ${valueColor}`}>
           <AnimatedValue value={value} />
         </span>
         {delta ? (
@@ -96,7 +104,7 @@ export function StatCard({
               delta.direction === "up"
                 ? "text-positive"
                 : delta.direction === "down"
-                  ? "text-accent"
+                  ? "text-danger"
                   : "text-ink-subtle"
             }`}
           >

@@ -126,7 +126,7 @@ export function LeadRow({ lead, index = 0 }: { lead: Lead; index?: number }) {
                       <DetailRow label="Potential Revenue">
                         {lead.estimated_value ? (
                           <span className="tabular font-medium">
-                            ${lead.estimated_value.toLocaleString()}
+                            ₹{lead.estimated_value.toLocaleString("en-IN")}
                           </span>
                         ) : (
                           <span className="text-ink-subtle">Not set</span>

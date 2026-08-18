@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { SetPageTitle } from "../page-title-context";
-import { getClients, getProjects } from "@/lib/records-data";
+import { getClients, getProjects, getExpenses } from "@/lib/records-data";
 import { getLeads } from "@/lib/dashboard-data";
 import { Card, PageHeader } from "@/components/ui";
 import { shortDate } from "@/lib/records";
@@ -24,10 +24,11 @@ export default async function SettingsPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const [leads, clients, projects] = await Promise.all([
+  const [leads, clients, projects, expenses] = await Promise.all([
     getLeads(),
     getClients(),
     getProjects(),
+    getExpenses(),
   ]);
 
   return (
@@ -63,6 +64,7 @@ export default async function SettingsPage() {
           <Row label="Leads" value={String(leads.length)} />
           <Row label="Clients" value={String(clients.length)} />
           <Row label="Projects" value={String(projects.length)} />
+          <Row label="Expenses" value={String(expenses.length)} />
         </Card>
 
         <Card>

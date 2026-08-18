@@ -1,7 +1,7 @@
 import { Wallet } from "lucide-react";
 import { SetPageTitle } from "../page-title-context";
 import { getPayments, getProjects } from "@/lib/records-data";
-import { PAYMENT_TYPE_LABELS, money, shortDate } from "@/lib/records";
+import { PAYMENT_TYPE_STYLES, money, shortDate } from "@/lib/records";
 import { Card, EmptyState, PageHeader } from "@/components/ui";
 import { PaymentForm } from "./payment-form";
 import { PaymentRowMenu } from "./payment-row-menu";
@@ -63,8 +63,10 @@ export default async function PaymentsPage() {
                     <td className="text-ink px-3 py-2.5 font-medium">
                       {payment.project_title}
                     </td>
-                    <td className="text-ink-muted px-3 py-2.5">
-                      {PAYMENT_TYPE_LABELS[payment.type]}
+                    <td className="px-3 py-2.5">
+                      <span className={`inline-flex items-center rounded-full px-2 py-[3px] text-[10px] font-semibold tracking-[0.04em] ${PAYMENT_TYPE_STYLES[payment.type].className}`}>
+                        {PAYMENT_TYPE_STYLES[payment.type].label}
+                      </span>
                     </td>
                     <td className="text-ink tabular px-3 py-2.5 font-medium whitespace-nowrap">
                       {money(Number(payment.amount))}

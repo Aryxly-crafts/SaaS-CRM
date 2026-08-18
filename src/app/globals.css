@@ -1,34 +1,45 @@
 @import "tailwindcss";
 
 :root {
-  /* Brand palette — cool neutrals with a single blue accent. */
-  --canvas: #edeff3;
-  --surface: #fcfdfd;
-  --surface-muted: #f4f6f9;
+  /* ── Surfaces ─────────────────────────────────────────────── */
+  --canvas: #f8fafc;
+  --surface: #ffffff;
+  --surface-muted: #f1f5f9;
 
-  --ink: #2a2b33;
-  --ink-muted: #555663;
-  --ink-subtle: #9fa0b5;
+  /* ── Ink (text) ───────────────────────────────────────────── */
+  --ink: #0b1c30;
+  --ink-muted: #414752;
+  --ink-subtle: #717783;
 
-  --line: #dfe4ea;
-  --line-strong: #c6d1d7;
+  /* ── Lines / borders ──────────────────────────────────────── */
+  --line: #e2e8f0;
+  --line-strong: #c1c6d4;
 
-  /* Blue carries every interactive state. */
+  /* ── Accent (primary blue) ────────────────────────────────── */
   --accent: #2f7eda;
-  --accent-hover: #2569b9;
-  --accent-soft: #e8f0fb;
+  --accent-hover: #005cad;
+  --accent-soft: #d5e3ff;
 
-  /* Status tints — desaturated so they read as data, not decoration. */
-  --danger: #b04545;
-  --danger-soft: #f7e9e9;
-  --positive: #3d7a5c;
-  --info: #2f7eda;
+  /* ── Status colours — soft-fill style per Stitch design ──── */
+  --positive: #10b981;
+  --positive-soft: #ecfdf5;
+  --danger: #ef4444;
+  --danger-soft: #fef2f2;
+  --warning: #f59e0b;
+  --warning-soft: #fffbeb;
+  --info: #0ea5e9;
+  --info-soft: #f0f9ff;
 
-  /* Elevation — tight and neutral. */
-  --elevation-card: 0 1px 2px rgba(42, 43, 51, 0.05);
-  --elevation-card-hover: 0 4px 14px -4px rgba(42, 43, 51, 0.1);
-  --elevation-popover: 0 12px 32px -8px rgba(42, 43, 51, 0.18);
-  --elevation-window: 0 24px 60px -12px rgba(42, 43, 51, 0.16);
+  /* ── Priority colours ─────────────────────────────────────── */
+  --priority-high: #7c3aed;
+  --priority-medium: #3b82f6;
+  --priority-low: #94a3b8;
+
+  /* ── Elevation — light and minimal per Stitch ─────────────── */
+  --elevation-card: 0 1px 2px rgba(11, 28, 48, 0.04);
+  --elevation-card-hover: 0 4px 12px -4px rgba(11, 28, 48, 0.08);
+  --elevation-popover: 0 4px 12px rgba(0, 0, 0, 0.05);
+  --elevation-window: 0 24px 48px -12px rgba(11, 28, 48, 0.12);
 }
 
 @theme inline {
@@ -46,13 +57,66 @@
   --color-danger: var(--danger);
   --color-danger-soft: var(--danger-soft);
   --color-positive: var(--positive);
+  --color-positive-soft: var(--positive-soft);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
   --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
+  --color-priority-high: var(--priority-high);
+  --color-priority-medium: var(--priority-medium);
+  --color-priority-low: var(--priority-low);
   --font-sans: var(--font-sans);
 }
 
 body {
   background: var(--canvas);
   color: var(--ink);
+}
+
+/* ── Typography scale from Stitch design system ──────────── */
+.text-display-lg {
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 40px;
+  letter-spacing: -0.02em;
+}
+
+.text-headline-md {
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 32px;
+}
+
+.text-headline-sm {
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 28px;
+}
+
+.text-body-lg {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+}
+
+.text-body-md {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+}
+
+.text-label-md {
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 16px;
+  letter-spacing: 0.05em;
+}
+
+.text-data-tabular {
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 18px;
+  font-variant-numeric: tabular-nums;
 }
 
 /* Tabular figures wherever numbers line up column-to-column. */

@@ -5,6 +5,7 @@ import { STATUS_ORDER, type LeadStatus } from "@/lib/leads";
 import { StatusBadge } from "@/components/status-badge";
 import { Card, EmptyState, PageHeader } from "@/components/ui";
 import { LeadForm } from "./lead-form";
+import { ImportLeadsModal } from "./import-modal";
 import { LeadActions } from "./lead-actions";
 import { StatusFilter } from "./status-filter";
 
@@ -41,7 +42,12 @@ export default async function LeadsPage({
       <PageHeader
         title="Leads"
         description={`${allLeads.length} total in the pipeline`}
-        action={<LeadForm />}
+        action={
+          <div className="flex items-center gap-2">
+            <ImportLeadsModal />
+            <LeadForm />
+          </div>
+        }
       />
 
       <StatusFilter active={activeStatus} counts={counts} total={allLeads.length} />
@@ -99,7 +105,7 @@ export default async function LeadsPage({
                     </td>
                     <td className="text-ink tabular px-3 py-2.5 whitespace-nowrap">
                       {lead.estimated_value
-                        ? `$${lead.estimated_value.toLocaleString()}`
+                        ? `₹${lead.estimated_value.toLocaleString("en-IN")}`
                         : "—"}
                     </td>
                     <td className="px-3 py-2.5">

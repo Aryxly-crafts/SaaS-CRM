@@ -74,3 +74,25 @@ export async function getDocumentUrl(fileUrl: string): Promise<string> {
   if (error) throw error;
   return data.signedUrl;
 }
+
+// Records a generated invoice/SOW into the documents library
+export async function recordGeneratedDocument(
+  projectId: string,
+  type: DocumentType,
+  fileName: string
+) {
+  const ctx = await getWorkspaceContext();
+  const supabase = await createClient();
+
+  const { error } = await supabase.from("documents").insert({
+    project_id: projectId,
+    type,
+    file_url: `generated/${projectId}/${Date.now()}-${safeName(fileName)}`,
+    file_name: fileName,
+    user_id: ctx.userId,
+    workspace_type: ctx.mode,
+  });
+
+  if (error) throw error;
+  revalidatePath("/documents");
+}

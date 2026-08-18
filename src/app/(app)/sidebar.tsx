@@ -3,15 +3,16 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { motion } from "motion/react";
 import {
   LayoutDashboard,
   Users,
   FolderKanban,
   Wallet,
   FileText,
+  Receipt,
   Settings,
   LogOut,
+  Plus,
 } from "lucide-react";
 import { signOut } from "./actions";
 import { WorkspaceSwitcher } from "@/components/workspace-switcher";
@@ -25,6 +26,7 @@ const PRIMARY_NAV = [
 const WORK_NAV = [
   { href: "/projects", label: "Projects", icon: FolderKanban },
   { href: "/payments", label: "Payments", icon: Wallet },
+  { href: "/expenses", label: "Expenses", icon: Receipt },
   { href: "/documents", label: "Documents", icon: FileText },
 ];
 
@@ -33,7 +35,7 @@ function isActive(pathname: string, href: string) {
   return href === "/" ? pathname === "/" : pathname.startsWith(href);
 }
 
-// A single sidebar link with an animated active pill behind it.
+// A single sidebar link with a left-accent active indicator per Stitch design.
 function NavLink({
   href,
   label,
@@ -48,19 +50,15 @@ function NavLink({
   return (
     <li className="relative">
       {active && (
-        <motion.div
-          layoutId="sidebar-active-pill"
-          className="bg-surface absolute inset-0 rounded-[10px] shadow-[var(--elevation-card)]"
-          transition={{ type: "spring", stiffness: 420, damping: 38 }}
-        />
+        <span className="bg-accent absolute top-1/2 left-0 h-5 w-[3px] -translate-y-1/2 rounded-r-full" />
       )}
       <Link
         href={href}
         aria-current={active ? "page" : undefined}
-        className={`relative z-10 flex items-center gap-2.5 rounded-[10px] px-3 py-2 text-[13px] transition-colors focus-visible:ring-2 focus-visible:ring-[var(--accent)]/40 focus-visible:outline-none ${
+        className={`relative z-10 flex items-center gap-2.5 rounded-lg px-3 py-2 text-body-md transition-colors focus-visible:ring-2 focus-visible:ring-[var(--accent)]/40 focus-visible:outline-none ${
           active
-            ? "text-ink font-medium"
-            : "text-ink-muted hover:text-ink font-normal"
+            ? "bg-surface-muted text-ink font-medium"
+            : "text-ink-muted hover:text-ink hover:bg-surface-muted font-normal"
         }`}
       >
         <Icon
@@ -74,7 +72,7 @@ function NavLink({
   );
 }
 
-// Left navigation — grouped sections, animated active state, workspace switcher, account footer.
+// Left navigation — grouped sections, left-accent active state, workspace switcher, account footer.
 export function Sidebar({
   userEmail,
   currentMode,
@@ -86,7 +84,7 @@ export function Sidebar({
   const initial = userEmail.charAt(0).toUpperCase() || "A";
 
   return (
-    <nav className="bg-canvas border-line scroll-hidden hidden w-[228px] flex-shrink-0 flex-col overflow-y-auto border-r px-3 py-5 md:flex">
+    <nav className="bg-surface border-line scroll-hidden hidden w-[228px] flex-shrink-0 flex-col overflow-y-auto border-r px-3 py-5 md:flex">
       <div className="mb-4 flex items-center gap-2 px-2">
         <Image
           src="/logo-mark.png"
@@ -101,9 +99,18 @@ export function Sidebar({
         </span>
       </div>
 
-      <div className="mb-5 px-1">
+      <div className="mb-3 px-1">
         <WorkspaceSwitcher currentMode={currentMode} variant="sidebar" />
       </div>
+
+      {/* Quick-add button */}
+      <Link
+        href="/leads"
+        className="bg-accent hover:bg-accent-hover mb-4 flex items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-[13px] font-medium text-white transition-colors"
+      >
+        <Plus size={15} strokeWidth={2} />
+        New Entry
+      </Link>
 
       <ul className="flex flex-col gap-0.5">
         {PRIMARY_NAV.map((item) => (
@@ -115,7 +122,7 @@ export function Sidebar({
         ))}
       </ul>
 
-      <p className="text-ink-subtle mt-6 mb-1.5 px-3 text-[10px] font-semibold tracking-[0.08em] uppercase">
+      <p className="text-ink-subtle text-label-md mt-6 mb-1.5 px-3 uppercase">
         Workspace
       </p>
       <ul className="flex flex-col gap-0.5">
@@ -151,7 +158,7 @@ export function Sidebar({
             type="submit"
             aria-label="Sign out"
             title="Sign out"
-            className="text-ink-subtle hover:text-ink hover:bg-line flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg transition-colors focus-visible:ring-2 focus-visible:ring-[var(--accent)]/40 focus-visible:outline-none"
+            className="text-ink-subtle hover:text-ink hover:bg-surface-muted flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg transition-colors focus-visible:ring-2 focus-visible:ring-[var(--accent)]/40 focus-visible:outline-none"
           >
             <LogOut size={15} strokeWidth={1.75} />
           </button>

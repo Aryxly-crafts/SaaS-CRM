@@ -1,11 +1,12 @@
 "use client";
 
-import { Search, Bell } from "lucide-react";
+import { Bell, HelpCircle } from "lucide-react";
 import { usePageTitle } from "./page-title-context";
 import { WorkspaceSwitcher } from "@/components/workspace-switcher";
+import { CommandSearch } from "@/components/command-search";
 import type { WorkspaceType } from "@/lib/leads";
 
-// Top bar: page title, global search affordance, workspace switcher, notifications, avatar.
+// Top bar: page title, global search command palette, workspace switcher, notifications, avatar.
 export function TopBar({
   userEmail,
   currentMode,
@@ -17,36 +18,36 @@ export function TopBar({
   const initial = userEmail.charAt(0).toUpperCase() || "A";
 
   return (
-    <header className="border-line flex items-center gap-4 border-b px-6 py-3.5">
-      <h1 className="text-ink text-[15px] font-semibold tracking-tight">
+    <header className="bg-surface border-line flex items-center gap-4 border-b px-6 py-3">
+      <h1 className="text-ink text-headline-sm whitespace-nowrap">
         {title}
       </h1>
 
-      <div className="relative ml-2 max-w-sm flex-1">
-        <Search
-          size={15}
-          strokeWidth={1.75}
-          className="text-ink-subtle pointer-events-none absolute top-1/2 left-3 -translate-y-1/2"
-        />
-        <input
-          type="search"
-          placeholder="Search leads, projects, clients…"
-          className="border-line bg-surface-muted text-ink placeholder:text-ink-subtle focus:border-line-strong focus:bg-surface w-full rounded-[10px] border py-2 pr-3 pl-9 text-[13px] transition-colors focus:ring-2 focus:ring-[var(--accent)]/15 focus:outline-none"
-        />
+      <div className="ml-4 max-w-md flex-1">
+        <CommandSearch />
       </div>
 
-      <div className="ml-auto flex items-center gap-3">
+      <div className="ml-auto flex items-center gap-2">
         <WorkspaceSwitcher currentMode={currentMode} variant="topbar" />
 
-        <div className="bg-line h-4 w-[1px]" />
+        <div className="bg-line h-5 w-[1px]" />
+
+        <button
+          type="button"
+          aria-label="Help"
+          className="text-ink-muted hover:text-ink hover:bg-surface-muted relative flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg transition-colors focus-visible:ring-2 focus-visible:ring-[var(--accent)]/40 focus-visible:outline-none"
+        >
+          <HelpCircle size={17} strokeWidth={1.75} />
+        </button>
 
         <button
           type="button"
           aria-label="Notifications"
-          className="text-ink-muted hover:text-ink hover:bg-surface-muted relative flex h-9 w-9 cursor-pointer items-center justify-center rounded-[10px] transition-colors focus-visible:ring-2 focus-visible:ring-[var(--accent)]/40 focus-visible:outline-none"
+          className="text-ink-muted hover:text-ink hover:bg-surface-muted relative flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg transition-colors focus-visible:ring-2 focus-visible:ring-[var(--accent)]/40 focus-visible:outline-none"
         >
           <Bell size={17} strokeWidth={1.75} />
         </button>
+
         <span className="bg-accent-soft text-accent flex h-8 w-8 items-center justify-center rounded-full text-[12px] font-semibold">
           {initial}
         </span>

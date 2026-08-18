@@ -23,7 +23,7 @@ function Panel({
   children: React.ReactNode;
 }) {
   return (
-    <section className="border-line rounded-[16px] border p-4">
+    <section className="border-line bg-surface rounded-[12px] border p-4">
       <div className="mb-3 flex items-center justify-between">
         <h2 className="text-ink text-[13px] font-semibold">{title}</h2>
         {meta ? (

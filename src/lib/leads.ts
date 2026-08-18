@@ -40,15 +40,15 @@ export const STATUS_STYLES: Record<
   LeadStatus,
   { label: string; className: string }
 > = {
-  cold: { label: "COLD", className: "bg-[#edeff3] text-[#555663]" },
-  contacted: { label: "CONTACTED", className: "bg-[#e8f0fb] text-[#2569b9]" },
-  interested: { label: "INTERESTED", className: "bg-[#e6f0ec] text-[#3d7a5c]" },
+  cold: { label: "COLD", className: "bg-[#f1f5f9] text-[#64748b]" },
+  contacted: { label: "CONTACTED", className: "bg-info-soft text-[#0284c7]" },
+  interested: { label: "INTERESTED", className: "bg-warning-soft text-[#d97706]" },
   negotiating: {
     label: "NEGOTIATING",
-    className: "bg-[#2f7eda] text-white",
+    className: "bg-accent text-white",
   },
-  won: { label: "WON", className: "bg-[#3d7a5c] text-white" },
-  lost: { label: "LOST", className: "bg-[#f7e9e9] text-[#b04545]" },
+  won: { label: "WON", className: "bg-positive text-white" },
+  lost: { label: "LOST", className: "bg-danger-soft text-danger" },
 };
 
 const ESTIMATED_VALUE_THRESHOLD = 50000;

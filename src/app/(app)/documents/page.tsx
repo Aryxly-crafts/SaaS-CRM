@@ -5,6 +5,7 @@ import { DOCUMENT_TYPE_LABELS, shortDate } from "@/lib/records";
 import { Card, EmptyState, PageHeader } from "@/components/ui";
 import { DocumentForm } from "./document-form";
 import { DocumentRowMenu } from "./document-row-menu";
+import { InvoiceGeneratorModal } from "./invoice-generator";
 
 // Document library backed by a private Supabase Storage bucket.
 export default async function DocumentsPage() {
@@ -19,7 +20,12 @@ export default async function DocumentsPage() {
       <PageHeader
         title="Documents"
         description={`${documents.length} file${documents.length === 1 ? "" : "s"} stored`}
-        action={<DocumentForm projects={projects} />}
+        action={
+          <div className="flex items-center gap-2">
+            <InvoiceGeneratorModal projects={projects} />
+            <DocumentForm projects={projects} />
+          </div>
+        }
       />
 
       <Card className="overflow-hidden">

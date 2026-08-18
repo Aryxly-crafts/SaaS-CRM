@@ -19,8 +19,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${chivo.variable} h-full antialiased`}>
-      <body className="bg-canvas text-ink h-full font-sans">{children}</body>
+    <html lang="en" className={`${chivo.variable} h-full antialiased`} suppressHydrationWarning>
+      <body className="bg-canvas text-ink h-full font-sans" suppressHydrationWarning>{children}</body>
     </html>
   );
 }

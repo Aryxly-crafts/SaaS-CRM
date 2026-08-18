@@ -1,0 +1,55 @@
+flowchart TD
+    subgraph Context ["🌐 Workspace Context Controller (Global Mode Switcher)"]
+        direction TB
+        Mode["Mode: [Team Workspace] ↔ [Personal Workspace]"]
+    end
+
+    subgraph Scraper ["1. Lead Ingestion"]
+        LS["Lead Scraper Automation"]
+        Batch["Select Batch (e.g. 10 Daily Leads)"]
+        LS --> Batch
+    end
+
+    subgraph TeamSpace ["2. 🏢 TEAM WORKSPACE (Agency Core)"]
+        direction TB
+        subgraph TeamCRM ["Team CRM Module"]
+            T_Leads["Team Leads Pipeline"]
+            T_Clients["Team Clients & Projects"]
+            T_Payments["Team Revenue & Invoices"]
+            T_Leads -->|Won / Deal Closed| T_Clients
+            T_Clients --> T_Payments
+        end
+
+        subgraph TeamExp ["Team Expenses Module"]
+            T_Budget["Project Budget & Milestones"]
+            T_Costs["Project Direct Expenses (Hosting, APIs, Tools, Contractors)"]
+            T_NetMargin["Team Net Profit & Cash Reserves"]
+            T_Payouts["Founder Payout Distribution"]
+            T_Payments -->|Auto-Sync Revenue| T_Budget
+            T_Budget --> T_Costs
+            T_Costs --> T_NetMargin
+            T_NetMargin --> T_Payouts
+        end
+    end
+
+    subgraph PersonalSpace ["3. 👤 PERSONAL WORKSPACE (Founder Private Space)"]
+        direction TB
+        subgraph PersonalCRM ["Personal CRM Module"]
+            P_Leads["Personal Leads & Side Projects"]
+            P_Clients["Personal Clients & Billing"]
+            P_Leads --> P_Clients
+        end
+
+        subgraph PersonalExp ["Personal Expenses Module"]
+            P_Income["Personal Inflow (Team Payout Share + Personal Projects)"]
+            P_Expenses["Personal Expenses (Living, Tools, Subscriptions)"]
+            P_Savings["Personal Savings & Budget Runway"]
+            P_Income --> P_Expenses
+            P_Expenses --> P_Savings
+        end
+    end
+
+    Batch -->|Route to Team| T_Leads
+    Batch -.->|Route to Personal| P_Leads
+
+    T_Payouts ==>|Automatic / 1-Click Payout Transfer| P_Income

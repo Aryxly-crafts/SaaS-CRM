@@ -11,7 +11,7 @@ const BUTTON_VARIANTS: Record<ButtonVariant, string> = {
 };
 
 const BUTTON_BASE =
-  "inline-flex cursor-pointer items-center justify-center gap-1.5 rounded-[10px] px-3 py-1.5 text-[12.5px] font-medium transition-colors focus-visible:ring-2 focus-visible:ring-[var(--accent)]/40 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50";
+  "inline-flex cursor-pointer items-center justify-center gap-1.5 rounded-lg px-3 py-1.5 text-body-md font-medium transition-colors focus-visible:ring-2 focus-visible:ring-[var(--accent)]/40 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50";
 
 // Shared button styling used for both <button> and <Link> actions.
 export function buttonClass(variant: ButtonVariant = "secondary") {
@@ -57,7 +57,7 @@ export function Card({
   children: React.ReactNode;
 }) {
   return (
-    <div className={`border-line rounded-[16px] border ${className}`}>
+    <div className={`border-line bg-surface rounded-[12px] border ${className}`}>
       {children}
     </div>
   );
@@ -76,11 +76,11 @@ export function PageHeader({
   return (
     <div className="mb-4 flex items-start justify-between gap-4">
       <div>
-        <h2 className="text-ink text-[15px] font-semibold tracking-tight">
+        <h2 className="text-ink text-headline-sm">
           {title}
         </h2>
         {description && (
-          <p className="text-ink-muted mt-0.5 text-[12.5px]">{description}</p>
+          <p className="text-ink-muted text-body-md mt-0.5">{description}</p>
         )}
       </div>
       {action}
@@ -115,7 +115,7 @@ export function EmptyState({
 }
 
 const FIELD_BASE =
-  "border-line bg-surface-muted text-ink placeholder:text-ink-subtle focus:border-accent focus:bg-surface w-full rounded-[10px] border px-3 py-2 text-[13px] transition-colors focus:ring-2 focus:ring-[var(--accent)]/15 focus:outline-none";
+  "border-line bg-surface-muted text-ink placeholder:text-ink-subtle focus:border-accent focus:bg-surface w-full rounded-lg border px-3 py-2 text-body-md transition-colors focus:ring-2 focus:ring-[var(--accent)]/15 focus:outline-none";
 
 // Labelled text input for forms.
 export function Field({

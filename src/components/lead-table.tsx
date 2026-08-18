@@ -18,7 +18,7 @@ export async function LeadTable() {
   const leads = await getLeads();
 
   return (
-    <section className="border-line overflow-hidden rounded-[16px] border">
+    <section className="border-line bg-surface overflow-hidden rounded-[12px] border">
       <TableTabs count={leads.length} />
 
       {leads.length === 0 ? (
