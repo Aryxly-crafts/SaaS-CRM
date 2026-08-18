@@ -140,7 +140,7 @@ export function BudgetModal({ budgets, projects, isTeam }: BudgetModalProps) {
                           placeholder="Max Cost (₹)"
                           className="w-28 text-[12px]"
                         />
-                        <Button type="submit" size="sm" disabled={isPending}>
+                        <Button type="submit" disabled={isPending} className="px-2.5 py-1 text-[12px]">
                           <Check size={12} />
                         </Button>
                       </div>
@@ -202,7 +202,7 @@ export function BudgetModal({ budgets, projects, isTeam }: BudgetModalProps) {
                           placeholder="Monthly cap (₹)"
                           className="w-28 text-[12px]"
                         />
-                        <Button type="submit" size="sm" disabled={isPending}>
+                        <Button type="submit" disabled={isPending} className="px-2.5 py-1 text-[12px]">
                           <Check size={12} />
                         </Button>
                         {existing && (

@@ -25,17 +25,18 @@ export const getWorkspaceContext = cache(async (): Promise<WorkspaceContext> => 
   };
 });
 
-export interface FilterableQuery<T> {
-  eq(column: string, value: unknown): T;
+interface QueryFilter {
+  eq(column: string, value: unknown): QueryFilter;
 }
 
 // Applies workspace scope filter to a Supabase query builder.
-export function applyWorkspaceFilter<T extends FilterableQuery<T>>(query: T, ctx: WorkspaceContext): T {
+export function applyWorkspaceFilter<T>(query: T, ctx: WorkspaceContext): T {
+  const q = query as unknown as QueryFilter;
   if (ctx.mode === "personal") {
     if (!ctx.userId) {
-      return query.eq("workspace_type", "personal").eq("user_id", "00000000-0000-0000-0000-000000000000");
+      return q.eq("workspace_type", "personal").eq("user_id", "00000000-0000-0000-0000-000000000000") as unknown as T;
     }
-    return query.eq("workspace_type", "personal").eq("user_id", ctx.userId);
+    return q.eq("workspace_type", "personal").eq("user_id", ctx.userId) as unknown as T;
   }
-  return query.eq("workspace_type", "team");
+  return q.eq("workspace_type", "team") as unknown as T;
 }
