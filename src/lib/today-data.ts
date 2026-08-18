@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { getWorkspaceContext, applyWorkspaceFilter } from "@/lib/workspace";
-import type { Lead } from "@/lib/leads";
+import type { Lead, WorkspaceType } from "@/lib/leads";
 
 /**
  * How many calls count as a finished day. A constant rather than a setting:
@@ -20,6 +20,8 @@ export interface TodaysCalls {
   /** Total uncalled leads, which may exceed what the queue shows. */
   remaining: number;
   target: number;
+  /** Active workspace, so an empty queue can explain itself honestly. */
+  mode: WorkspaceType;
 }
 
 // Local midnight as an ISO timestamp, so "today" means the founder's today rather than UTC's.
@@ -59,10 +61,18 @@ export async function getTodaysCalls(): Promise<TodaysCalls> {
 
   const [queue, remaining, done] = await Promise.all([queueQuery, remainingQuery, doneQuery]);
 
+  // A failed query used to fall through to zeros, which renders as a calm empty
+  // queue and is indistinguishable from having no work left. Say what broke.
+  const failure = queue.error ?? remaining.error ?? done.error;
+  if (failure) {
+    throw new Error(`Could not load today's calls: ${failure.message}`);
+  }
+
   return {
     queue: (queue.data as Lead[]) ?? [],
     remaining: remaining.count ?? 0,
     doneToday: done.count ?? 0,
     target: DAILY_CALL_TARGET,
+    mode: ctx.mode,
   };
 }

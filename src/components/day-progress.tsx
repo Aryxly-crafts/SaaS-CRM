@@ -9,10 +9,12 @@ export function DayProgress({
   done,
   target,
   remaining,
+  personal,
 }: {
   done: number;
   target: number;
   remaining: number;
+  personal: boolean;
 }) {
   const reduceMotion = useReducedMotion();
   const met = done >= target;
@@ -54,9 +56,11 @@ export function DayProgress({
       </div>
 
       <p className="text-ink-subtle mt-3 text-[12px]">
-        {remaining === 0
-          ? "No leads waiting. Send more across from the scraper."
-          : `${remaining} lead${remaining === 1 ? "" : "s"} waiting to be called.`}
+        {remaining > 0
+          ? `${remaining} lead${remaining === 1 ? "" : "s"} waiting to be called.`
+          : personal
+            ? "Scraped leads land in the Team workspace, not Personal."
+            : "No leads waiting. Send more across from the scraper."}
       </p>
     </section>
   );

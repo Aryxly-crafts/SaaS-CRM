@@ -6,7 +6,8 @@ import { PageHeader } from "@/components/ui";
 
 // The day's call list: what to ring, how far through you are, and nothing else.
 export default async function TodayPage() {
-  const { queue, doneToday, remaining, target } = await getTodaysCalls();
+  const { queue, doneToday, remaining, target, mode } = await getTodaysCalls();
+  const personal = mode === "personal";
 
   return (
     <>
@@ -17,8 +18,8 @@ export default async function TodayPage() {
       />
 
       <div className="flex flex-col gap-4">
-        <DayProgress done={doneToday} target={target} remaining={remaining} />
-        <CallQueue leads={queue} />
+        <DayProgress done={doneToday} target={target} remaining={remaining} personal={personal} />
+        <CallQueue leads={queue} personal={personal} />
       </div>
     </>
   );

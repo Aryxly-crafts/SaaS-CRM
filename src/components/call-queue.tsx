@@ -8,7 +8,7 @@ import type { Lead } from "@/lib/leads";
 
 // The day's call list. Rows leave as they are called, so progress is something
 // you watch happen rather than a number you read.
-export function CallQueue({ leads }: { leads: Lead[] }) {
+export function CallQueue({ leads, personal }: { leads: Lead[]; personal: boolean }) {
   const reduceMotion = useReducedMotion();
   // Optimistically hidden ids, so a row leaves the instant it is called rather
   // than after the server round trip.
@@ -63,9 +63,13 @@ export function CallQueue({ leads }: { leads: Lead[] }) {
         <span className="bg-positive-soft text-positive mx-auto flex h-11 w-11 items-center justify-center rounded-full">
           <Check size={22} strokeWidth={2.25} />
         </span>
-        <p className="text-ink text-headline-sm mt-3">Queue cleared.</p>
+        <p className="text-ink text-headline-sm mt-3">
+          {personal ? "Nothing here in Personal." : "Queue cleared."}
+        </p>
         <p className="text-ink-muted text-body-md mt-1">
-          Every lead in the list has been called. Send more across from the scraper.
+          {personal
+            ? "Leads sent from the scraper go to the Team workspace, because a personal lead needs an owner the scraper cannot set. Switch to Team to work today's calls."
+            : "Every lead in the list has been called. Send more across from the scraper."}
         </p>
         {lastCalled && (
           <button
