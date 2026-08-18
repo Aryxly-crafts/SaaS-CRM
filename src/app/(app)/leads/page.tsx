@@ -5,7 +5,7 @@ import { STATUS_ORDER, type LeadStatus } from "@/lib/leads";
 import { StatusBadge } from "@/components/status-badge";
 import { Card, EmptyState, PageHeader } from "@/components/ui";
 import { LeadForm } from "./lead-form";
-import { ImportLeadsModal } from "./import-modal";
+import { ScraperLink } from "./scraper-link";
 import { LeadActions } from "./lead-actions";
 import { StatusFilter } from "./status-filter";
 
@@ -44,7 +44,7 @@ export default async function LeadsPage({
         description={`${allLeads.length} total in the pipeline`}
         action={
           <div className="flex items-center gap-2">
-            <ImportLeadsModal />
+            <ScraperLink />
             <LeadForm />
           </div>
         }

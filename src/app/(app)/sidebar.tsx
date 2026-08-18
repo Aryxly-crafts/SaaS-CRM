@@ -10,6 +10,7 @@ import {
   Wallet,
   FileText,
   Receipt,
+  PhoneCall,
   Settings,
   LogOut,
   Plus,
@@ -20,6 +21,7 @@ import type { WorkspaceType } from "@/lib/leads";
 
 const PRIMARY_NAV = [
   { href: "/", label: "Overview", icon: LayoutDashboard },
+  { href: "/today", label: "Today's Calls", icon: PhoneCall },
   { href: "/leads", label: "Leads", icon: Users },
 ];
 
