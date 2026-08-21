@@ -42,7 +42,7 @@ export function Modal({
   return createPortal(
     <AnimatePresence>
       {open && (
-        <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto p-4 sm:p-8">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-start justify-center overflow-y-auto p-0 sm:p-8">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -56,15 +56,19 @@ export function Modal({
             role="dialog"
             aria-modal="true"
             aria-label={title}
-            initial={{ opacity: 0, y: 12, scale: 0.98 }}
+            initial={{ opacity: 0, y: 24, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 8, scale: 0.98 }}
+            exit={{ opacity: 0, y: 24, scale: 0.98 }}
             transition={{ type: "spring", stiffness: 420, damping: 34 }}
-            className="bg-surface border-line relative my-auto w-full max-w-[440px] rounded-[18px] border p-5 shadow-[var(--elevation-popover)]"
+            className="bg-surface border-line relative z-10 my-0 sm:my-auto max-h-[90vh] sm:max-h-[85vh] w-full max-w-full sm:max-w-[460px] overflow-y-auto rounded-t-[22px] sm:rounded-[18px] border-t sm:border p-5 sm:p-6 shadow-[var(--elevation-popover)]"
+            style={{ paddingBottom: "max(20px, env(safe-area-inset-bottom))" }}
           >
+            {/* Mobile Drag Indicator */}
+            <div className="mx-auto mb-3 h-1.5 w-10 rounded-full bg-slate-200 sm:hidden" />
+
             <div className="mb-4 flex items-start justify-between gap-4">
               <div>
-                <h2 className="text-ink text-[15px] font-semibold tracking-tight">
+                <h2 className="text-ink text-[16px] sm:text-[15px] font-semibold tracking-tight">
                   {title}
                 </h2>
                 {description && (
@@ -79,7 +83,7 @@ export function Modal({
                 aria-label="Close dialog"
                 className="text-ink-subtle hover:text-ink hover:bg-surface-muted -mt-1 -mr-1 flex h-8 w-8 flex-shrink-0 cursor-pointer items-center justify-center rounded-lg transition-colors"
               >
-                <X size={16} strokeWidth={2} />
+                <X size={17} strokeWidth={2} />
               </button>
             </div>
             {children}
@@ -90,3 +94,4 @@ export function Modal({
     document.body
   );
 }
+

@@ -11,7 +11,7 @@ const BUTTON_VARIANTS: Record<ButtonVariant, string> = {
 };
 
 const BUTTON_BASE =
-  "inline-flex cursor-pointer items-center justify-center gap-1.5 rounded-lg px-3 py-1.5 text-body-md font-medium transition-colors focus-visible:ring-2 focus-visible:ring-[var(--accent)]/40 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50";
+  "inline-flex cursor-pointer items-center justify-center gap-1.5 rounded-lg px-3.5 py-2 sm:px-3 sm:py-1.5 text-[13.5px] sm:text-body-md font-medium transition-colors focus-visible:ring-2 focus-visible:ring-[var(--accent)]/40 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 min-h-[38px] sm:min-h-[34px]";
 
 // Shared button styling used for both <button> and <Link> actions.
 export function buttonClass(variant: ButtonVariant = "secondary") {
@@ -74,19 +74,20 @@ export function PageHeader({
   action?: React.ReactNode;
 }) {
   return (
-    <div className="mb-4 flex items-start justify-between gap-4">
+    <div className="mb-4 flex flex-col sm:flex-row sm:items-start justify-between gap-2.5 sm:gap-4">
       <div>
-        <h2 className="text-ink text-headline-sm">
+        <h2 className="text-ink text-[18px] sm:text-headline-sm font-semibold sm:font-bold">
           {title}
         </h2>
         {description && (
-          <p className="text-ink-muted text-body-md mt-0.5">{description}</p>
+          <p className="text-ink-muted text-[13px] sm:text-body-md mt-0.5">{description}</p>
         )}
       </div>
-      {action}
+      {action && <div className="flex items-center flex-wrap gap-2">{action}</div>}
     </div>
   );
 }
+
 
 // Centred empty state for tables and lists with no rows yet.
 export function EmptyState({
@@ -115,7 +116,7 @@ export function EmptyState({
 }
 
 const FIELD_BASE =
-  "border-line bg-surface-muted text-ink placeholder:text-ink-subtle focus:border-accent focus:bg-surface w-full rounded-lg border px-3 py-2 text-body-md transition-colors focus:ring-2 focus:ring-[var(--accent)]/15 focus:outline-none";
+  "border-line bg-surface-muted text-ink placeholder:text-ink-subtle focus:border-accent focus:bg-surface w-full rounded-lg border px-3 py-2 text-[16px] sm:text-body-md transition-colors focus:ring-2 focus:ring-[var(--accent)]/15 focus:outline-none min-h-[42px] sm:min-h-[38px]";
 
 // Bare input styled with standard field base.
 export function Input({

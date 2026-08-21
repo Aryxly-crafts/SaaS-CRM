@@ -60,7 +60,7 @@ export default async function LoginPage({
             required
             autoComplete="email"
             placeholder="Email"
-            className="text-ink placeholder:text-ink-muted mb-2.5 w-full rounded-[11px] border border-white/60 bg-white/55 px-3.5 py-2.5 text-[13px] transition-colors outline-none focus:border-white focus:bg-white/85"
+            className="text-ink placeholder:text-ink-muted mb-2.5 w-full rounded-[11px] border border-white/60 bg-white/55 px-3.5 py-2.5 text-[16px] sm:text-[13px] transition-colors outline-none focus:border-white focus:bg-white/85"
           />
 
           <label htmlFor="password" className="sr-only">
@@ -73,7 +73,7 @@ export default async function LoginPage({
             required
             autoComplete="current-password"
             placeholder="Password"
-            className="text-ink placeholder:text-ink-muted w-full rounded-[11px] border border-white/60 bg-white/55 px-3.5 py-2.5 text-[13px] transition-colors outline-none focus:border-white focus:bg-white/85"
+            className="text-ink placeholder:text-ink-muted w-full rounded-[11px] border border-white/60 bg-white/55 px-3.5 py-2.5 text-[16px] sm:text-[13px] transition-colors outline-none focus:border-white focus:bg-white/85"
           />
 
           {error && (

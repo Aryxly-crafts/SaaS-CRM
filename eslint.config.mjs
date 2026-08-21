@@ -12,9 +12,12 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
-    // Vendored Claude skill scripts — not part of the app source.
+    // Vendored skill scripts and build utilities — not part of the app source.
     ".claude/**",
+    ".agents/**",
+    "scripts/**",
   ]),
 ]);
+
 
 export default eslintConfig;

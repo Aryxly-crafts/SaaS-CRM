@@ -6,6 +6,7 @@ import { Card, PageHeader } from "@/components/ui";
 import { shortDate } from "@/lib/records";
 import { signOut } from "../actions";
 import { Button } from "@/components/ui";
+import { PwaInstallCard } from "@/components/pwa-install-card";
 
 // One labelled row inside a settings card.
 function Row({ label, value }: { label: string; value: string }) {
@@ -36,10 +37,13 @@ export default async function SettingsPage() {
       <SetPageTitle title="Settings" />
       <PageHeader
         title="Settings"
-        description="Account details and workspace totals."
+        description="Account details, PWA installation, and workspace totals."
       />
 
       <div className="flex max-w-[560px] flex-col gap-4">
+        {/* PWA Mobile Installation Card */}
+        <PwaInstallCard />
+
         <Card>
           <div className="border-line border-b px-4 py-2.5">
             <h3 className="text-ink text-[13px] font-semibold">Account</h3>
@@ -84,3 +88,4 @@ export default async function SettingsPage() {
     </>
   );
 }
+

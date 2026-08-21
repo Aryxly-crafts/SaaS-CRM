@@ -102,17 +102,17 @@ export function CommandSearch({
 
   return (
     <>
-      {/* TopBar Search Trigger Input */}
+      {/* Search Trigger for Desktop (Full bar) and Mobile (Icon button + compact bar) */}
       <div
         onClick={() => setOpen(true)}
-        className="border-line bg-surface-muted text-ink-subtle hover:border-line-strong hover:bg-surface relative flex max-w-md flex-1 cursor-pointer items-center gap-2 rounded-lg border py-2 pr-3 pl-9 text-body-md transition-colors"
+        className="border-line bg-surface-muted text-ink-subtle hover:border-line-strong hover:bg-surface relative flex max-w-md flex-1 cursor-pointer items-center gap-2 rounded-lg border py-1.5 px-3 text-body-md transition-colors sm:py-2 sm:pr-3 sm:pl-9"
       >
         <Search
           size={15}
           strokeWidth={1.75}
-          className="text-ink-subtle pointer-events-none absolute top-1/2 left-3 -translate-y-1/2"
+          className="text-ink-subtle pointer-events-none flex-shrink-0 sm:absolute sm:top-1/2 sm:left-3 sm:-translate-y-1/2"
         />
-        <span className="truncate text-[13px]">{placeholder}</span>
+        <span className="truncate text-[12.5px] sm:text-[13px]">{placeholder}</span>
         <div className="ml-auto hidden items-center gap-1 sm:flex">
           <kbd className="bg-surface border-line text-ink-muted rounded border px-1.5 py-0.5 text-[10px] font-semibold">
             ⌘K
@@ -123,7 +123,7 @@ export function CommandSearch({
       {/* Command Palette Overlay */}
       <AnimatePresence>
         {open && (
-          <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/40 p-4 pt-20 backdrop-blur-sm">
+          <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/40 p-3 pt-12 sm:p-4 sm:pt-20 backdrop-blur-sm">
             <motion.div
               initial={{ opacity: 0, scale: 0.96, y: -10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
