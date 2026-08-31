@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Chivo } from "next/font/google";
 import "./globals.css";
+import { SwCleanup } from "@/components/sw-cleanup";
 
 const chivo = Chivo({
   variable: "--font-sans",
@@ -37,6 +38,7 @@ export default function RootLayout({
     <html lang="en" className={`${chivo.variable} h-full antialiased`} suppressHydrationWarning>
       <body className="bg-canvas text-ink h-full font-sans" suppressHydrationWarning>
         {children}
+        <SwCleanup />
       </body>
     </html>
   );
