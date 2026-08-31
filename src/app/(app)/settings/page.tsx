@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { getAuthUser } from "@/lib/supabase/server";
 import { SetPageTitle } from "../page-title-context";
 import { getClients, getProjects, getExpenses } from "@/lib/records-data";
 import { getLeads } from "@/lib/dashboard-data";
@@ -19,10 +19,7 @@ function Row({ label, value }: { label: string; value: string }) {
 
 // Account and workspace overview.
 export default async function SettingsPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getAuthUser();
 
   const [leads, clients, projects, expenses] = await Promise.all([
     getLeads(),

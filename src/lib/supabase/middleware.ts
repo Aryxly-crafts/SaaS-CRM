@@ -1,6 +1,19 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
+// Supabase Auth calls have no built-in timeout; without one a slow/unreachable
+// auth endpoint hangs the whole request until Vercel kills the function at 25s.
+const AUTH_TIMEOUT_MS = 5000;
+
+function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<T>((_, reject) =>
+      setTimeout(() => reject(new Error("Supabase auth call timed out")), ms)
+    ),
+  ]);
+}
+
 // Verifies the session on every request and redirects signed-out users to /login.
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
@@ -32,7 +45,7 @@ export async function updateSession(request: NextRequest) {
 
     const {
       data: { user },
-    } = await supabase.auth.getUser();
+    } = await withTimeout(supabase.auth.getUser(), AUTH_TIMEOUT_MS);
     const signedIn = Boolean(user);
 
     if (!signedIn && request.nextUrl.pathname !== "/login") {

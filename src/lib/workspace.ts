@@ -1,6 +1,6 @@
 import { cache } from "react";
 import { cookies } from "next/headers";
-import { createClient } from "@/lib/supabase/server";
+import { getAuthUser } from "@/lib/supabase/server";
 import { WorkspaceType } from "@/lib/leads";
 
 export interface WorkspaceContext {
@@ -14,10 +14,7 @@ export const getWorkspaceContext = cache(async (): Promise<WorkspaceContext> => 
   const modeCookie = cookieStore.get("workspace_mode")?.value;
   const mode: WorkspaceType = modeCookie === "personal" ? "personal" : "team";
 
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getAuthUser();
 
   return {
     mode,
