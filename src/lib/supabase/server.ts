@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
+import { cache } from "react";
 
 // Supabase client for use in Server Components, Server Actions, and Route Handlers
 export async function createClient() {
@@ -31,3 +32,14 @@ export async function createClient() {
     },
   });
 }
+
+// Resolves the signed-in user once per request; every server component /
+// server action on the same request shares this result instead of each
+// making its own round-trip to Supabase Auth.
+export const getAuthUser = cache(async () => {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  return user;
+});

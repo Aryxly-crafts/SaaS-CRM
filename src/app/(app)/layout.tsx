@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { getAuthUser } from "@/lib/supabase/server";
 import { getWorkspaceContext } from "@/lib/workspace";
 import { Sidebar } from "./sidebar";
 import { PageTitleProvider } from "./page-title-context";
@@ -14,10 +14,7 @@ export default async function AppLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getAuthUser();
   const userEmail = user?.email ?? "";
 
   const ctx = await getWorkspaceContext();
