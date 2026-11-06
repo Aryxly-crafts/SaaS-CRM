@@ -36,8 +36,9 @@ export function RealtimeListener() {
     const debouncedRefresh = () => {
       if (debounceTimer) clearTimeout(debounceTimer);
       debounceTimer = setTimeout(() => {
+        debounceTimer = null;
         router.refresh();
-      }, 350);
+      }, 1000);
     };
 
     // Global Realtime channel with debounced refreshes

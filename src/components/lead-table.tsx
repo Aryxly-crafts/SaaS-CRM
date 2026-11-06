@@ -15,7 +15,7 @@ const COLUMNS = [
 
 // The core dashboard table, styled after the reference's Lead Quality panel.
 export async function LeadTable() {
-  const leads = await getLeads();
+  const leads = await getLeads(50);
 
   return (
     <section className="border-line bg-surface overflow-hidden rounded-[12px] border">

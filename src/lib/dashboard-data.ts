@@ -82,15 +82,18 @@ export async function getDashboardStats(): Promise<DashboardStats> {
   };
 }
 
-// Fetches all leads for the dashboard table, newest first, scoped to active workspace.
-export async function getLeads(): Promise<Lead[]> {
+// Fetches leads newest first, scoped to active workspace, with an optional result cap.
+export async function getLeads(limit?: number): Promise<Lead[]> {
   const supabase = await createClient();
   const ctx = await getWorkspaceContext();
 
   let query = supabase
     .from("leads")
-    .select("*")
+    .select(
+      "id, business_name, category, phone, address, status, notes, source, priority_score, estimated_value, created_at, workspace_type, user_id"
+    )
     .order("created_at", { ascending: false });
+  if (limit) query = query.limit(limit);
   query = applyWorkspaceFilter(query, ctx);
 
   const { data, error } = await query;
