@@ -30,6 +30,13 @@ export function RealtimeListener() {
   };
 
   useEffect(() => {
+    if (
+      !process.env.NEXT_PUBLIC_SUPABASE_URL ||
+      !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    ) {
+      return;
+    }
+
     const supabase = createClient();
     let debounceTimer: NodeJS.Timeout | null = null;
 

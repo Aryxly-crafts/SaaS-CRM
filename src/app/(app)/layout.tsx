@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
 import { getWorkspaceContext } from "@/lib/workspace";
 import { Sidebar } from "./sidebar";
 import { PageTitleProvider } from "./page-title-context";
@@ -7,6 +7,9 @@ import { PageTransition } from "./page-transition";
 import { RealtimeListener } from "@/components/realtime-listener";
 import { MobileNav } from "@/components/mobile-nav";
 
+// Auth and workspace data depend on runtime-provided Supabase environment variables.
+export const dynamic = "force-dynamic";
+
 // Shared shell for every authenticated screen: sidebar, top bar, and a
 // scrolling content column that fills the viewport edge to edge.
 export default async function AppLayout({
@@ -14,11 +17,14 @@ export default async function AppLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  const userEmail = user?.email ?? "";
+  let userEmail = "";
+  if (isSupabaseConfigured()) {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    userEmail = user?.email ?? "";
+  }
 
   const ctx = await getWorkspaceContext();
 
