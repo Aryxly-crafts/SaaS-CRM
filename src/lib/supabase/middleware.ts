@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { getSupabaseConfig } from "./config";
 
 // Supabase Auth calls have no built-in timeout; without one a slow/unreachable
 // auth endpoint hangs the whole request until Vercel kills the function at 25s.
@@ -18,15 +19,16 @@ function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
 
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-  if (!url || !key) {
+  let config: ReturnType<typeof getSupabaseConfig>;
+  try {
+    config = getSupabaseConfig();
+  } catch (err) {
+    console.error("Supabase configuration error:", err);
     return supabaseResponse;
   }
 
   try {
-    const supabase = createServerClient(url, key, {
+    const supabase = createServerClient(config.url, config.key, {
       cookies: {
         getAll() {
           return request.cookies.getAll();
